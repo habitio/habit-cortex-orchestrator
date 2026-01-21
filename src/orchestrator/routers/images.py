@@ -19,6 +19,49 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/images", tags=["images"])
 
 
+# Helper functions
+def _parse_env_metadata_from_labels(labels: dict[str, str]) -> list[dict]:
+    """
+    Parse environment variable metadata from Docker image labels.
+    
+    Looks for labels with pattern: io.habit.cortex.env.<VAR_NAME>.<attribute>
+    
+    Example label:
+        io.habit.cortex.env.APPLICATION_ID.required="true"
+        io.habit.cortex.env.APPLICATION_ID.description="App identifier"
+    
+    Returns:
+        List of environment variable metadata dictionaries
+    """
+    env_metadata = {}
+    prefix = "io.habit.cortex.env."
+    
+    for label_key, label_value in labels.items():
+        if not label_key.startswith(prefix):
+            continue
+        
+        # Parse: io.habit.cortex.env.<VAR_NAME>.<attribute>
+        parts = label_key[len(prefix):].split(".", 1)
+        if len(parts) != 2:
+            continue
+        
+        var_name, attribute = parts
+        
+        if var_name not in env_metadata:
+            env_metadata[var_name] = {"name": var_name}
+        
+        # Convert string booleans
+        if label_value.lower() == "true":
+            label_value = True
+        elif label_value.lower() == "false":
+            label_value = False
+        
+        env_metadata[var_name][attribute] = label_value
+    
+    # Return as sorted list
+    return sorted(env_metadata.values(), key=lambda x: (not x.get("required", False), x["name"]))
+
+
 # Pydantic schemas
 class ImageBuildRequest(BaseModel):
     """Schema for triggering an image build."""
@@ -44,6 +87,15 @@ class ImageResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class ImageInspectResponse(BaseModel):
+    """Schema for Docker image inspection."""
+    image_name: str
+    env_vars: list[str]  # List of ENV variables from the image (e.g., ["PATH=/usr/local/bin", "PORT=8000"])
+    env_metadata: list[dict] | None  # Parsed metadata for environment variables from labels
+    labels: dict[str, str] | None
+    created: str | None
 
 
 class GitHubTagResponse(BaseModel):
@@ -232,6 +284,77 @@ def get_image(image_id: int, db: Session = Depends(get_db)):
         )
     
     return image
+
+
+@router.get("/{image_id}/inspect", response_model=ImageInspectResponse)
+def inspect_image(image_id: int, db: Session = Depends(get_db)):
+    """
+    Inspect a Docker image and return its environment variables and metadata.
+    
+    This endpoint inspects the built Docker image to extract:
+    - Environment variables defined in the Dockerfile
+    - Labels
+    - Creation date
+    
+    Use this to populate environment variable fields when creating a product instance.
+    """
+    import docker
+    
+    # Get image record from database
+    image = db.query(DockerImage).filter(DockerImage.id == image_id).first()
+    
+    if not image:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Image {image_id} not found",
+        )
+    
+    # Check if image was built successfully
+    if image.build_status != "success":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Image build status is '{image.build_status}', must be 'success' to inspect",
+        )
+    
+    # Inspect the Docker image
+    try:
+        docker_client = docker.from_env()
+        full_image_name = f"{image.name}:{image.tag}"
+        
+        # Get image details from Docker
+        docker_image = docker_client.images.get(full_image_name)
+        image_config = docker_image.attrs.get("Config", {})
+        
+        # Extract environment variables
+        env_vars = image_config.get("Env", [])
+        
+        # Extract labels
+        labels = image_config.get("Labels") or {}
+        
+        # Extract creation date
+        created = docker_image.attrs.get("Created")
+        
+        # Parse environment variable metadata from labels
+        env_metadata = _parse_env_metadata_from_labels(labels)
+        
+        return ImageInspectResponse(
+            image_name=full_image_name,
+            env_vars=env_vars,
+            env_metadata=env_metadata,
+            labels=labels,
+            created=created,
+        )
+    except docker.errors.ImageNotFound:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Docker image '{full_image_name}' not found on host. The image may have been removed.",
+        )
+    except Exception as e:
+        logger.error(f"Error inspecting image {full_image_name}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to inspect image: {str(e)}",
+        )
 
 
 @router.delete("/{image_id}", status_code=status.HTTP_204_NO_CONTENT)
