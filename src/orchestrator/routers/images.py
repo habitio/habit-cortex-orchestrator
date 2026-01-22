@@ -205,7 +205,10 @@ def create_image_build(build_request: ImageBuildRequest, db: Session = Depends(g
             logger.info(f"Starting build for {full_image_name}")
             
             # Build the image (GitHub token from database)
-            build_service = ImageBuildService(github_token=github_token)
+            build_service = ImageBuildService(
+                github_token=github_token,
+                build_cache_dir=settings.build_cache_dir
+            )
             
             def log_callback(message: str):
                 """Append to build log in real-time."""

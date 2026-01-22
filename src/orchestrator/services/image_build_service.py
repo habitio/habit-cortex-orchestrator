@@ -19,15 +19,20 @@ logger = logging.getLogger(__name__)
 class ImageBuildService:
     """Service for building Docker images from GitHub repositories."""
     
-    def __init__(self, github_token: str | None = None):
+    def __init__(self, github_token: str | None = None, build_cache_dir: str = "./build-cache"):
         """
         Initialize Docker client and GitHub service.
         
         Args:
             github_token: Optional GitHub token for private repo access
+            build_cache_dir: Directory for storing temporary build files
         """
         self.docker_client = docker.from_env()
         self.github_service = GitHubService(token=github_token)
+        self.build_cache_dir = Path(build_cache_dir)
+        
+        # Create build cache directory if it doesn't exist
+        self.build_cache_dir.mkdir(parents=True, exist_ok=True)
     
     def build_from_github(
         self,
@@ -63,8 +68,8 @@ class ImageBuildService:
             logger.info(message)
         
         try:
-            # Create temporary directory
-            temp_dir = tempfile.mkdtemp(prefix="docker-build-")
+            # Create temporary directory in build cache
+            temp_dir = tempfile.mkdtemp(prefix="docker-build-", dir=str(self.build_cache_dir))
             temp_path = Path(temp_dir)
             tarball_path = temp_path / "repo.tar.gz"
             

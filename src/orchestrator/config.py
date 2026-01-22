@@ -74,6 +74,12 @@ class Settings(BaseSettings):
     # Logging
     log_level: str = Field(default="INFO", description="Logging level")
     
+    # Build Configuration
+    build_cache_dir: str = Field(
+        default="./build-cache",
+        description="Directory for storing temporary build files and caches",
+    )
+    
     # GitHub Integration
     github_token: str | None = Field(
         default=None,
