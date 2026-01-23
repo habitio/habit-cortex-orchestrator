@@ -252,3 +252,42 @@ class DockerManager:
         except APIError as e:
             logger.error(f"Failed to get logs for service {service_id}: {e}")
             raise
+    
+    def stream_service_logs(self, service_id: str, tail: int = 100):
+        """
+        Stream logs from a Docker service (generator for SSE).
+        
+        Args:
+            service_id: Docker service ID
+            tail: Number of lines to return from the end initially
+            
+        Yields:
+            Log lines as they arrive
+            
+        Raises:
+            NotFound: If service doesn't exist
+            APIError: If Docker API call fails
+        """
+        try:
+            service = self.client.services.get(service_id)
+            # follow=True automatically returns a generator/stream
+            logs = service.logs(
+                stdout=True,
+                stderr=True,
+                tail=tail,
+                follow=True,  # Stream new logs (returns generator)
+                timestamps=True,
+            )
+            
+            for chunk in logs:
+                if isinstance(chunk, bytes):
+                    yield chunk.decode('utf-8', errors='replace')
+                else:
+                    yield chunk
+                    
+        except NotFound:
+            logger.warning(f"Service {service_id} not found")
+            raise
+        except APIError as e:
+            logger.error(f"Failed to stream logs for service {service_id}: {e}")
+            raise

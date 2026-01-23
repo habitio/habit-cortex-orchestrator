@@ -1,0 +1,1177 @@
+nohup: ignoring input
+INFO:     Started server process [401715]
+INFO:     Waiting for application startup.
+2026-01-23 14:03:17,282 - orchestrator.main - INFO - Starting Cortex Orchestrator...
+2026-01-23 14:03:17,282 - orchestrator.main - INFO - Database URL: postgresql://habit-bre-cortex-orchestrator:uiyiuyi65577yuyuyYTT@localhost:5432/habit-bre-cortex-orchestrator
+2026-01-23 14:03:17,282 - orchestrator.main - INFO - Docker Host: unix:///var/run/docker.sock
+2026-01-23 14:03:17,282 - orchestrator.main - INFO - API Port: 8004
+2026-01-23 14:03:17,302 - orchestrator.main - INFO - Database tables created/verified
+2026-01-23 14:03:17,302 - orchestrator.main - INFO - Cortex Orchestrator started successfully
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8004 (Press CTRL+C to quit)
+INFO:     10.10.141.1:40016 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40014 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54794 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54802 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:03:25,602 - orchestrator.routers.mqtt_config - INFO - Updated MQTT configuration for product 2
+INFO:     127.0.0.1:59830 - "PUT /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54818 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54832 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37466 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37472 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:35128 - "POST /api/v1/products/2/mqtt-config/test HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1135, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/routing.py", line 115, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/routing.py", line 101, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/routing.py", line 355, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/routing.py", line 243, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/src/orchestrator/routers/mqtt_config.py", line 196, in test_mqtt_connection
+    import paho.mqtt.client as mqtt
+ModuleNotFoundError: No module named 'paho'
+INFO:     127.0.0.1:35134 - "POST /api/v1/products/2/mqtt-config/test HTTP/1.1" 500 Internal Server Error
+ERROR:    Exception in ASGI application
+Traceback (most recent call last):
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/uvicorn/protocols/http/httptools_impl.py", line 416, in run_asgi
+    result = await app(  # type: ignore[func-returns-value]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/uvicorn/middleware/proxy_headers.py", line 60, in __call__
+    return await self.app(scope, receive, send)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/applications.py", line 1135, in __call__
+    await super().__call__(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/applications.py", line 107, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 186, in __call__
+    raise exc
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/middleware/errors.py", line 164, in __call__
+    await self.app(scope, receive, _send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/middleware/cors.py", line 85, in __call__
+    await self.app(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/middleware/exceptions.py", line 63, in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/middleware/asyncexitstack.py", line 18, in __call__
+    await self.app(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/routing.py", line 716, in __call__
+    await self.middleware_stack(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/routing.py", line 736, in app
+    await route.handle(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/routing.py", line 290, in handle
+    await self.app(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/routing.py", line 115, in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 53, in wrapped_app
+    raise exc
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/starlette/_exception_handler.py", line 42, in wrapped_app
+    await app(scope, receive, sender)
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/routing.py", line 101, in app
+    response = await f(request)
+               ^^^^^^^^^^^^^^^^
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/routing.py", line 355, in app
+    raw_response = await run_endpoint_function(
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/venv/lib/python3.12/site-packages/fastapi/routing.py", line 243, in run_endpoint_function
+    return await dependant.call(**values)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/djsb/development/bre-tyres-01/cortex-orchestrator/src/orchestrator/routers/mqtt_config.py", line 196, in test_mqtt_connection
+    import paho.mqtt.client as mqtt
+ModuleNotFoundError: No module named 'paho'
+INFO:     10.10.141.1:37482 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37490 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50882 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50886 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50898 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50888 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59474 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59480 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:03:55,311 - orchestrator.routers.mqtt_config - INFO - MQTT connection test for product 2: error
+INFO:     127.0.0.1:51882 - "POST /api/v1/products/2/mqtt-config/test HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59484 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59488 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:38216 - "GET /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43802 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43808 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43830 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43822 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42258 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42272 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42292 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42288 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54324 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54332 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33748 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33756 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33776 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33770 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40328 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40322 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40346 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40334 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59370 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59384 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59392 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59398 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32834 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32822 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32860 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32850 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40370 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40378 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40390 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40384 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54540 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54550 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54554 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54566 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33480 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33490 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33496 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33506 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56584 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56596 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56600 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56612 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39090 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39100 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39102 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39110 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38346 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38340 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38376 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38360 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42600 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42584 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42618 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42608 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44444 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44454 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44468 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44480 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43126 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43112 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43142 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43154 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50912 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50916 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50936 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50922 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53394 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53408 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53420 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53432 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42322 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42326 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42342 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42354 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35500 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35506 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35508 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35510 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54668 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54670 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54682 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54696 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37870 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37884 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37888 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37904 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47174 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47158 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47188 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47194 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44048 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44052 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44060 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44064 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56888 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56884 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56898 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56892 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:43514 - "GET /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51900 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51898 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51902 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51908 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58138 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58132 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58156 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58150 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56270 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56276 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56284 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56296 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53376 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53374 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53384 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53388 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54058 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54048 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54072 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54082 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39814 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39830 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39836 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39832 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38604 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38592 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38634 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38620 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35134 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35142 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35160 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35150 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47088 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47090 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47104 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47114 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53774 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53786 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53796 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53798 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50454 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50446 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50458 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50468 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42996 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42982 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43024 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43010 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39030 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39042 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39056 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39044 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49836 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49848 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49868 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49852 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45026 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45034 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39206 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39198 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39212 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39222 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38166 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38176 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38186 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38190 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53254 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53270 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53288 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53280 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50238 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50234 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50252 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50268 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38650 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38644 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38660 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38662 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36282 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36298 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36308 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36324 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50682 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50684 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50704 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50692 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49486 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49470 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49502 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49516 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36682 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36694 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36698 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36714 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49462 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49456 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49482 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49478 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57832 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57822 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57838 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57852 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58302 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58312 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58328 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58332 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54680 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54694 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54706 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54718 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46692 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46700 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46716 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46718 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56588 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56590 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56600 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56596 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58500 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58506 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58520 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58530 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60586 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60602 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60616 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60624 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33516 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33522 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33528 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33534 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47624 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47620 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47632 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47634 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58328 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58330 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58342 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58354 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42172 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42184 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42196 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42194 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54890 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54906 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54922 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54938 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35408 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35398 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35428 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35420 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54558 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54570 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54576 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54582 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56118 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56130 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56134 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56136 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37188 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37202 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37206 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37220 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51040 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51024 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51042 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51054 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57256 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57270 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57286 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57280 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58618 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58634 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58638 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58654 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34468 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34484 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34486 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34488 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38606 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38608 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38636 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38620 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50008 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50012 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50018 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50032 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41906 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41896 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41934 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41920 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44392 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44408 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44414 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44418 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57238 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57252 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57266 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57272 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58104 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58118 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58128 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58144 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60728 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60726 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33840 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33842 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33844 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33852 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34208 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34216 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34230 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34222 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56508 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56514 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56524 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56522 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40688 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40692 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40702 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40706 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60594 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60602 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60616 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60628 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60760 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60746 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:46666 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60770 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60764 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60452 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60446 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60458 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60470 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38914 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38912 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38918 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38934 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43324 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43312 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43330 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43332 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52606 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52600 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52618 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52622 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59950 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59938 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59976 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59960 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57806 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57810 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57820 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57812 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44648 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44656 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44670 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44672 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49314 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49318 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49328 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49344 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46152 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46166 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46182 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46184 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48116 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48126 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:19:22,118 - orchestrator.routers.products - INFO - Updated product 'Invoice Protection' (ID: 2)
+2026-01-23 14:19:22,236 - orchestrator.utils.logging_helpers - INFO - Audit logged: update_product on product:2 by system
+INFO:     127.0.0.1:60628 - "PATCH /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48140 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48156 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:60640 - "POST /api/v1/images HTTP/1.1" 422 Unprocessable Entity
+INFO:     10.10.141.1:50436 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50422 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45048 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50452 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50438 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45056 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51750 - "POST /api/v1/images HTTP/1.1" 422 Unprocessable Entity
+INFO:     10.10.141.1:34888 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34904 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34906 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34914 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32848 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32854 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32876 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32864 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56062 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56078 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56082 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56092 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56918 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56926 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56928 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56936 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43704 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43716 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43730 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43736 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53990 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54002 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54006 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54020 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50774 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50784 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:20:43,887 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+2026-01-23 14:20:43,946 - orchestrator.services.docker_manager - INFO - Removed service 'product-invoice-protection' (ID: zfyukluyyfizxguemdl1rx580)
+2026-01-23 14:20:43,954 - orchestrator.routers.products - INFO - Stopped product 'Invoice Protection' (ID: 2)
+2026-01-23 14:20:43,966 - orchestrator.utils.logging_helpers - INFO - Activity logged: product_stopped - Invoice Protection stopped
+2026-01-23 14:20:43,971 - orchestrator.utils.logging_helpers - INFO - Audit logged: stop_product on product:2 by system
+INFO:     127.0.0.1:56926 - "POST /api/v1/products/2/stop HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50798 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50806 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:20:48,863 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+2026-01-23 14:20:48,880 - orchestrator.services.docker_manager - INFO - Created service 'product-invoice-protection' (ID: efhpckqkwes9po75a1koe0bh1) for product 'Invoice Protection' (ID: 2) using image 'bre-cortex:v0.0.5'
+2026-01-23 14:20:48,884 - orchestrator.routers.products - INFO - Started product 'Invoice Protection' (ID: 2)
+2026-01-23 14:20:48,887 - orchestrator.utils.logging_helpers - INFO - Activity logged: product_started - Invoice Protection started
+2026-01-23 14:20:48,889 - orchestrator.utils.logging_helpers - INFO - Audit logged: start_product on product:2 by system
+INFO:     127.0.0.1:56928 - "POST /api/v1/products/2/start HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34108 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34102 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     172.18.0.3:58960 - "GET /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34110 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34116 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58132 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58138 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58150 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58140 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38348 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38344 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38354 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38364 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57008 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57024 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:21:27,168 - orchestrator.routers.mqtt_config - INFO - Updated MQTT configuration for product 2
+INFO:     127.0.0.1:51688 - "PUT /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57040 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57050 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:21:31,658 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+2026-01-23 14:21:31,663 - orchestrator.services.docker_manager - INFO - Removed service 'product-invoice-protection' (ID: efhpckqkwes9po75a1koe0bh1)
+2026-01-23 14:21:31,664 - orchestrator.routers.products - INFO - Stopped product 'Invoice Protection' (ID: 2)
+2026-01-23 14:21:31,668 - orchestrator.utils.logging_helpers - INFO - Activity logged: product_stopped - Invoice Protection stopped
+2026-01-23 14:21:31,670 - orchestrator.utils.logging_helpers - INFO - Audit logged: stop_product on product:2 by system
+INFO:     127.0.0.1:36878 - "POST /api/v1/products/2/stop HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40188 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40192 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:21:33,682 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+2026-01-23 14:21:33,688 - orchestrator.services.docker_manager - INFO - Created service 'product-invoice-protection' (ID: mztud03mwhz0qm74viul4dluk) for product 'Invoice Protection' (ID: 2) using image 'bre-cortex:v0.0.5'
+2026-01-23 14:21:33,690 - orchestrator.routers.products - INFO - Started product 'Invoice Protection' (ID: 2)
+2026-01-23 14:21:33,691 - orchestrator.utils.logging_helpers - INFO - Activity logged: product_started - Invoice Protection started
+2026-01-23 14:21:33,693 - orchestrator.utils.logging_helpers - INFO - Audit logged: start_product on product:2 by system
+INFO:     127.0.0.1:36892 - "POST /api/v1/products/2/start HTTP/1.1" 200 OK
+INFO:     172.18.0.3:60660 - "GET /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40208 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40222 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38260 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38264 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38282 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38274 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48032 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48046 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48058 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48066 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:45742 - "GET /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39292 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39298 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39322 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39306 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58910 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58898 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58922 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58924 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46528 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46536 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46538 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46548 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41548 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41540 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41556 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41572 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44642 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44654 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49956 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49946 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49958 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49968 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42140 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42142 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42150 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42166 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34940 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34956 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     172.18.0.3:56796 - "GET /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34970 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:34972 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60030 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60028 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60040 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60052 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51058 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51074 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51086 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51102 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     172.18.0.3:33566 - "GET /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59270 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59276 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59286 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59290 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46004 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46012 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46020 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46024 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54308 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54314 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54318 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54332 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58410 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58416 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58424 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58440 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39464 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39458 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39474 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39472 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38610 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38622 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38624 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38628 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48046 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48048 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48050 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48052 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48072 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48062 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52118 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52122 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52138 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52148 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52152 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52160 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52170 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37430 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37438 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37440 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37448 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37452 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37468 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37476 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37492 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57024 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57026 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57030 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57042 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57058 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57068 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57078 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57088 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57100 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57098 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57106 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48656 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48674 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48672 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48688 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48686 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48712 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48696 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48718 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48734 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60042 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60056 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60068 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60078 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60088 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60090 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60098 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60112 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57152 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57166 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57176 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57170 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57192 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57180 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57204 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57208 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57210 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57064 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57080 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57092 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57114 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57106 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57116 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57118 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57128 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57140 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39886 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39896 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39902 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39916 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39924 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39926 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39936 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39928 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51666 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51652 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51690 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51682 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51700 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51714 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51716 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51726 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51718 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35876 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35904 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35888 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35910 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35918 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35926 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35940 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35954 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35950 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60578 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60564 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60580 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60592 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60608 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60622 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60642 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60632 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50636 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50650 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50662 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50658 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50668 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50672 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50678 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50682 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50696 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48500 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48516 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48532 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48542 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48534 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48552 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48556 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48566 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48564 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53710 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53694 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53730 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53720 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53748 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53732 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53768 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53756 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43578 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43566 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43606 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43594 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43614 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43626 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43636 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43648 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43656 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59714 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59738 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59724 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59764 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59752 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59778 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59784 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59790 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59804 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60016 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60030 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60044 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60042 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60052 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60058 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60076 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:60060 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:27:41,366 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+2026-01-23 14:27:41,373 - orchestrator.services.docker_manager - INFO - Removed service 'product-invoice-protection' (ID: mztud03mwhz0qm74viul4dluk)
+2026-01-23 14:27:41,374 - orchestrator.routers.products - INFO - Stopped product 'Invoice Protection' (ID: 2)
+2026-01-23 14:27:41,376 - orchestrator.utils.logging_helpers - INFO - Activity logged: product_stopped - Invoice Protection stopped
+2026-01-23 14:27:41,387 - orchestrator.utils.logging_helpers - INFO - Audit logged: stop_product on product:2 by system
+INFO:     127.0.0.1:53900 - "POST /api/v1/products/2/stop HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45928 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45944 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45950 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45948 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53908 - "PUT /api/v1/images/7 HTTP/1.1" 405 Method Not Allowed
+INFO:     10.10.141.1:45966 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45960 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45982 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45990 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45986 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41670 - "POST /api/v1/images HTTP/1.1" 422 Unprocessable Entity
+INFO:     10.10.141.1:39852 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39872 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39858 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:27:53,492 - orchestrator.routers.images - INFO - Created image build record: bre-payments:v0.0.6 (ID: 8)
+INFO:     127.0.0.1:41678 - "POST /api/v1/images HTTP/1.1" 201 Created
+2026-01-23 14:27:53,510 - orchestrator.routers.images - INFO - Starting build for bre-payments:v0.0.6
+2026-01-23 14:27:53,532 - orchestrator.services.image_build_service - INFO - Downloading bre-cortex@v0.0.6 from GitHub...
+INFO:     10.10.141.1:39900 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39888 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:27:53,830 - orchestrator.services.github_service - ERROR - Failed to download bre-cortex@v0.0.6: 404 Client Error: Not Found for url: https://api.github.com/repos/bre-cortex/tarball/v0.0.6
+2026-01-23 14:27:53,832 - orchestrator.services.image_build_service - INFO - ❌ Unexpected error: 404 Client Error: Not Found for url: https://api.github.com/repos/bre-cortex/tarball/v0.0.6
+2026-01-23 14:27:53,839 - orchestrator.services.image_build_service - INFO - Cleaned up temporary files
+2026-01-23 14:27:53,842 - orchestrator.routers.images - INFO - Build completed for bre-payments:v0.0.6: failed
+INFO:     10.10.141.1:39916 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39914 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:41688 - "PUT /api/v1/products/2 HTTP/1.1" 405 Method Not Allowed
+INFO:     10.10.141.1:39918 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39930 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53152 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53154 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53158 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53160 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53168 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53172 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53178 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39536 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39530 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39546 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53564 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53566 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56810 - "PATCH /api/v1/products/2 HTTP/1.1" 400 Bad Request
+INFO:     10.10.141.1:53576 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53588 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56820 - "PATCH /api/v1/images/8 HTTP/1.1" 405 Method Not Allowed
+INFO:     10.10.141.1:44772 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44770 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44792 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44786 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:44802 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48632 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48644 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48648 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48646 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48650 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52076 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52086 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52096 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52094 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36624 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36630 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:29:01,042 - orchestrator.routers.products - INFO - Updated product 'Invoice Protection' (ID: 2)
+2026-01-23 14:29:01,044 - orchestrator.utils.logging_helpers - INFO - Audit logged: update_product on product:2 by system
+INFO:     127.0.0.1:49730 - "PATCH /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36640 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36656 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:29:05,246 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+2026-01-23 14:29:05,252 - orchestrator.services.docker_manager - INFO - Created service 'product-invoice-protection' (ID: soz81funed13diz155e9oimdd) for product 'Invoice Protection' (ID: 2) using image 'bre-payments:v0.0.6'
+2026-01-23 14:29:05,254 - orchestrator.routers.products - INFO - Started product 'Invoice Protection' (ID: 2)
+2026-01-23 14:29:05,256 - orchestrator.utils.logging_helpers - INFO - Activity logged: product_started - Invoice Protection started
+2026-01-23 14:29:05,258 - orchestrator.utils.logging_helpers - INFO - Audit logged: start_product on product:2 by system
+INFO:     127.0.0.1:49740 - "POST /api/v1/products/2/start HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36666 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59416 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59430 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59436 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59444 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59460 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41680 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41668 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41688 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:41704 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58020 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58028 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58030 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58046 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:58062 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52688 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52702 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52710 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52718 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:52720 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32872 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32874 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32892 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:32882 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:29:59,942 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+2026-01-23 14:29:59,949 - orchestrator.services.docker_manager - INFO - Removed service 'product-invoice-protection' (ID: soz81funed13diz155e9oimdd)
+2026-01-23 14:29:59,951 - orchestrator.routers.products - INFO - Stopped product 'Invoice Protection' (ID: 2)
+2026-01-23 14:29:59,952 - orchestrator.utils.logging_helpers - INFO - Activity logged: product_stopped - Invoice Protection stopped
+2026-01-23 14:29:59,954 - orchestrator.utils.logging_helpers - INFO - Audit logged: stop_product on product:2 by system
+INFO:     127.0.0.1:39678 - "POST /api/v1/products/2/stop HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42300 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42316 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:30:01,965 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+2026-01-23 14:30:01,970 - orchestrator.services.docker_manager - INFO - Created service 'product-invoice-protection' (ID: kizq9kvc1dxytwmg7al7a72it) for product 'Invoice Protection' (ID: 2) using image 'bre-payments:v0.0.6'
+2026-01-23 14:30:01,971 - orchestrator.routers.products - INFO - Started product 'Invoice Protection' (ID: 2)
+2026-01-23 14:30:01,974 - orchestrator.utils.logging_helpers - INFO - Activity logged: product_started - Invoice Protection started
+2026-01-23 14:30:01,975 - orchestrator.utils.logging_helpers - INFO - Audit logged: start_product on product:2 by system
+INFO:     127.0.0.1:39680 - "POST /api/v1/products/2/start HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42326 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42330 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42346 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     127.0.0.1:39684 - "GET /api/v1/images/8 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43288 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43280 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43298 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43306 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43314 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43668 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43682 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43690 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43698 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59616 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59604 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59618 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59628 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59634 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50076 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50064 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50102 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50086 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50110 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35262 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35268 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35272 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35270 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33518 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33520 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33522 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33538 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33546 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39780 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39788 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39796 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39804 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39814 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     172.18.0.3:36604 - "GET /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59572 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59584 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59596 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59606 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45524 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45530 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45542 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45554 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45570 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51376 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51392 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51402 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51404 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:51414 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42724 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42728 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42740 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42750 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     172.18.0.3:41830 - "GET /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     172.18.0.3:41844 - "GET /api/v1/products/2/mqtt-config HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36642 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36650 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36662 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36678 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:36690 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54336 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54338 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54358 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54350 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54368 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:55470 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:55456 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:55780 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:55796 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:55800 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:55812 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:55814 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42276 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42282 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42290 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42304 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:42316 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43456 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43464 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43470 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43474 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38640 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38652 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38664 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38670 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:38686 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57652 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57658 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57672 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57678 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57684 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35876 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35892 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35896 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:35902 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57702 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57708 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57724 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57734 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:57736 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47020 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47028 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47040 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43142 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43150 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43160 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43166 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:35:27,222 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:43190 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43176 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43204 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:43218 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:35:32,337 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:49348 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49332 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49352 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49362 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:35:35,952 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:49368 - "GET /api/v1/products/2/logs/stream?tail=100 HTTP/1.1" 200 OK
+2026-01-23 14:35:37,424 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:49376 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49388 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49394 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:49406 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:35:42,499 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:40566 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40582 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40594 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:40610 - "GET /api/v1/products HTTP/1.1" 200 OK
+2026-01-23 14:35:53,672 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:48916 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48896 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48930 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48932 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48908 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:35:58,739 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:48944 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48958 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48972 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:48974 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:36:03,807 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:46310 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46306 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46314 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46322 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:36:08,882 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:46332 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46334 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46342 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46348 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:36:13,955 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:45014 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45030 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45036 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45042 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:36:19,027 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:45044 - "GET /health HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45058 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45046 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:45068 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39482 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+2026-01-23 14:36:23,822 - orchestrator.services.docker_manager - INFO - Network 'insurance-network' already exists
+INFO:     10.10.141.1:39484 - "GET /api/v1/products/2/status HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39490 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39502 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39504 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39524 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39510 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:39526 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47116 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47118 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47126 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47134 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47138 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47146 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47152 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:47160 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37456 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37466 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37478 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37490 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37492 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37498 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37510 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:37514 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56676 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56688 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56702 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56692 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56714 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56728 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56722 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56752 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:56738 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33152 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33154 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33160 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33162 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33170 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33184 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33198 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:33210 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50084 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50078 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50086 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50088 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50112 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50098 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50132 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:50124 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59016 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59032 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59046 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59060 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59072 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59102 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59086 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59104 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:59120 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53302 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53292 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53312 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53320 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53334 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53342 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53366 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:53352 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46792 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:46800 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:50080 - "POST /api/v1/products/2/generate-shared-key HTTP/1.1" 404 Not Found
+INFO:     10.10.141.1:54152 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54146 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54158 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54172 - "GET /api/v1/products/2 HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54174 - "GET /api/v1/products HTTP/1.1" 200 OK
+INFO:     10.10.141.1:54180 - "GET /api/v1/images HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+2026-01-23 14:39:56,057 - orchestrator.main - INFO - Shutting down Cortex Orchestrator...
+INFO:     Application shutdown complete.
+INFO:     Finished server process [401715]

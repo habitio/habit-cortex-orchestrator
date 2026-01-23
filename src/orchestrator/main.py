@@ -15,6 +15,7 @@ from orchestrator.routers.auth import router as auth_router
 from orchestrator.routers.images import router as images_router
 from orchestrator.routers.instance_api import router as instance_api_router
 from orchestrator.routers.subscriptions import router as subscriptions_router
+from orchestrator.routers.templates import router as templates_router
 
 # Configure logging
 logging.basicConfig(
@@ -49,6 +50,7 @@ app.include_router(auth_router)
 app.include_router(instance_api_router)  # Public API for instances (shared key auth)
 app.include_router(products_router)
 app.include_router(subscriptions_router)
+app.include_router(templates_router)
 app.include_router(images_router)
 app.include_router(admin_router)
 app.include_router(activity_router)

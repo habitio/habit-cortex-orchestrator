@@ -6,6 +6,8 @@ from orchestrator.database.models import (
     ActivityLog,
     AuditLog,
     EventSubscription,
+    EmailTemplate,
+    SMSTemplate,
     UserSession,
 )
 from orchestrator.database.session import SessionLocal, engine, get_db
@@ -16,6 +18,8 @@ __all__ = [
     "ActivityLog",
     "AuditLog",
     "EventSubscription",
+    "EmailTemplate",
+    "SMSTemplate",
     "UserSession",
     "SessionLocal",
     "engine",

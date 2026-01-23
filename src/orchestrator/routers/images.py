@@ -10,7 +10,8 @@ from sqlalchemy.orm import Session
 
 from orchestrator.config import settings
 from orchestrator.database import get_db
-from orchestrator.database.models import DockerImage, OrchestratorSettings
+from orchestrator.database.models import DockerImage, OrchestratorSettings, UserSession
+from orchestrator.routers.auth import get_current_user
 from orchestrator.services.github_service import GitHubService
 from orchestrator.services.image_build_service import ImageBuildService
 
@@ -108,7 +109,11 @@ class GitHubTagResponse(BaseModel):
 
 # Endpoints
 @router.get("/github-tags")
-def list_github_tags(repo: str = "habitio/bre-cortex", db: Session = Depends(get_db)):
+def list_github_tags(
+    repo: str = "habitio/bre-cortex",
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     List available tags from GitHub repository.
     
@@ -150,7 +155,11 @@ def list_github_tags(repo: str = "habitio/bre-cortex", db: Session = Depends(get
 
 
 @router.post("", response_model=ImageResponse, status_code=status.HTTP_201_CREATED)
-def create_image_build(build_request: ImageBuildRequest, db: Session = Depends(get_db)):
+def create_image_build(
+    build_request: ImageBuildRequest,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Create a new Docker image build from GitHub repository.
     
@@ -258,6 +267,7 @@ def create_image_build(build_request: ImageBuildRequest, db: Session = Depends(g
 @router.get("", response_model=list[ImageResponse])
 def list_images(
     status_filter: str | None = None,
+    current_user: UserSession = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -276,7 +286,11 @@ def list_images(
 
 
 @router.get("/{image_id}", response_model=ImageResponse)
-def get_image(image_id: int, db: Session = Depends(get_db)):
+def get_image(
+    image_id: int,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Get a specific Docker image by ID."""
     image = db.query(DockerImage).filter(DockerImage.id == image_id).first()
     
@@ -290,7 +304,11 @@ def get_image(image_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/{image_id}/inspect", response_model=ImageInspectResponse)
-def inspect_image(image_id: int, db: Session = Depends(get_db)):
+def inspect_image(
+    image_id: int,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Inspect a Docker image and return its environment variables and metadata.
     
@@ -361,7 +379,11 @@ def inspect_image(image_id: int, db: Session = Depends(get_db)):
 
 
 @router.delete("/{image_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_image(image_id: int, db: Session = Depends(get_db)):
+def delete_image(
+    image_id: int,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Delete a Docker image record and optionally the Docker image itself.
     

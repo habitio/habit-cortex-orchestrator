@@ -1,0 +1,26 @@
+                                         Table "public.products"
+   Column    |           Type           | Collation | Nullable |                 Default                  
+-------------+--------------------------+-----------+----------+------------------------------------------
+ id          | integer                  |           | not null | nextval('products_id_seq'::regclass)
+ name        | character varying(255)   |           | not null | 
+ slug        | character varying(100)   |           | not null | 
+ port        | integer                  |           | not null | 
+ replicas    | integer                  |           | not null | 
+ status      | character varying(50)    |           | not null | 
+ service_id  | character varying(255)   |           |          | 
+ deployed_at | timestamp with time zone |           |          | 
+ created_at  | timestamp with time zone |           | not null | now()
+ updated_at  | timestamp with time zone |           | not null | now()
+ env_vars    | jsonb                    |           |          | '{}'::jsonb
+ image_id    | integer                  |           |          | 
+ image_name  | character varying(255)   |           | not null | 'bre-payments:latest'::character varying
+Indexes:
+    "products_pkey" PRIMARY KEY, btree (id)
+    "ix_products_id" btree (id)
+    "ix_products_slug" UNIQUE, btree (slug)
+    "products_port_key" UNIQUE CONSTRAINT, btree (port)
+Foreign-key constraints:
+    "products_image_id_fkey" FOREIGN KEY (image_id) REFERENCES docker_images(id)
+Referenced by:
+    TABLE "activity_log" CONSTRAINT "activity_log_product_id_fkey" FOREIGN KEY (product_id) REFERENCES products(id)
+

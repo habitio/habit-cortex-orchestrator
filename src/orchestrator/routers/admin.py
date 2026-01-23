@@ -7,7 +7,8 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from orchestrator.database import get_db
-from orchestrator.database.models import OrchestratorSettings
+from orchestrator.database.models import OrchestratorSettings, UserSession
+from orchestrator.routers.auth import get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,10 @@ def get_or_create_settings(db: Session) -> OrchestratorSettings:
 
 # Endpoints
 @router.get("/settings", response_model=SettingsResponse)
-def get_settings(db: Session = Depends(get_db)):
+def get_settings(
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Get orchestrator configuration settings.
     
@@ -65,6 +69,7 @@ def get_settings(db: Session = Depends(get_db)):
 @router.put("/settings", response_model=SettingsResponse)
 def update_settings(
     settings_update: SettingsUpdate,
+    current_user: UserSession = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
@@ -95,7 +100,10 @@ def update_settings(
 
 
 @router.delete("/settings/github-token", status_code=status.HTTP_204_NO_CONTENT)
-def clear_github_token(db: Session = Depends(get_db)):
+def clear_github_token(
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Clear the GitHub token from settings.
     

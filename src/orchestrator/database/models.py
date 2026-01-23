@@ -132,6 +132,16 @@ class Product(Base):
         back_populates="product",
         cascade="all, delete-orphan"
     )
+    email_templates: Mapped[list["EmailTemplate"]] = relationship(
+        "EmailTemplate",
+        back_populates="product",
+        cascade="all, delete-orphan"
+    )
+    sms_templates: Mapped[list["SMSTemplate"]] = relationship(
+        "SMSTemplate",
+        back_populates="product",
+        cascade="all, delete-orphan"
+    )
 
     def __repr__(self) -> str:
         return f"<Product(id={self.id}, name='{self.name}', slug='{self.slug}', status='{self.status}')>"
@@ -278,6 +288,134 @@ class EventSubscription(Base):
         }
 
 
+class EmailTemplate(Base):
+    """
+    Email template reference to ListMonk.
+    
+    Stores human-friendly template names that map to ListMonk template IDs.
+    Templates are product-specific and referenced in event subscription actions.
+    """
+    
+    __tablename__ = "email_templates"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"), nullable=False, index=True)
+    
+    # Human-friendly name for UI
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    
+    # ListMonk template ID
+    listmonk_template_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    
+    # Optional description
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+    # Template type for categorization
+    template_type: Mapped[str] = mapped_column(
+        String(50),
+        default="transactional",
+        nullable=False
+    )  # transactional, marketing, notification, system
+    
+    # Available variables (JSON array of variable names)
+    available_variables: Mapped[Optional[list]] = mapped_column(JSON, nullable=True, default=list)
+    
+    # Usage tracking
+    times_used: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    # Metadata
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    
+    # Relationships
+    product: Mapped["Product"] = relationship("Product", back_populates="email_templates")
+    
+    def to_dict(self):
+        """Convert to dictionary for API response."""
+        return {
+            "id": self.id,
+            "product_id": self.product_id,
+            "name": self.name,
+            "listmonk_template_id": self.listmonk_template_id,
+            "description": self.description,
+            "template_type": self.template_type,
+            "available_variables": self.available_variables or [],
+            "stats": {
+                "times_used": self.times_used,
+                "last_used_at": self.last_used_at.isoformat() if self.last_used_at else None,
+            },
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class SMSTemplate(Base):
+    """
+    SMS template configuration.
+    
+    Stores SMS message templates with variable placeholders.
+    Templates are product-specific and referenced in event subscription actions.
+    """
+    
+    __tablename__ = "sms_templates"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"), nullable=False, index=True)
+    
+    # Human-friendly name for UI
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    
+    # SMS message content (with {{variable}} placeholders)
+    message: Mapped[str] = mapped_column(Text, nullable=False)
+    
+    # Optional description
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+    # Template type for categorization
+    template_type: Mapped[str] = mapped_column(
+        String(50),
+        default="transactional",
+        nullable=False
+    )  # transactional, marketing, notification, system
+    
+    # Available variables (JSON array of variable names)
+    available_variables: Mapped[Optional[list]] = mapped_column(JSON, nullable=True, default=list)
+    
+    # Character count (for SMS planning)
+    char_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    
+    # Usage tracking
+    times_used: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    # Metadata
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    
+    # Relationships
+    product: Mapped["Product"] = relationship("Product", back_populates="sms_templates")
+    
+    def to_dict(self):
+        """Convert to dictionary for API response."""
+        return {
+            "id": self.id,
+            "product_id": self.product_id,
+            "name": self.name,
+            "message": self.message,
+            "description": self.description,
+            "template_type": self.template_type,
+            "available_variables": self.available_variables or [],
+            "char_count": self.char_count,
+            "stats": {
+                "times_used": self.times_used,
+                "last_used_at": self.last_used_at.isoformat() if self.last_used_at else None,
+            },
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
 class UserSession(Base):
     """
     User authentication sessions for orchestrator UI.
@@ -318,5 +456,7 @@ __all__ = [
     "ActivityLog",
     "AuditLog",
     "EventSubscription",
+    "EmailTemplate",
+    "SMSTemplate",
     "UserSession",
 ]
