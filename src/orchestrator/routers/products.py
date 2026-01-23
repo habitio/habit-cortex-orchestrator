@@ -6,11 +6,13 @@ from typing import List
 
 from docker.errors import APIError, NotFound
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from orchestrator.database import Product, get_db
+from orchestrator.database import Product, UserSession, get_db
+from orchestrator.routers.auth import get_current_user
 from orchestrator.services.docker_manager import DockerManager
 from orchestrator.utils.logging_helpers import log_activity, log_audit, calculate_changes
 
@@ -76,7 +78,12 @@ class ProductResponse(BaseModel):
 
 # Endpoints
 @router.post("", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
-def create_product(product_data: ProductCreate, request: Request, db: Session = Depends(get_db)):
+def create_product(
+    product_data: ProductCreate,
+    request: Request,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
     Create a new product instance definition.
     
@@ -162,14 +169,21 @@ def create_product(product_data: ProductCreate, request: Request, db: Session = 
 
 
 @router.get("", response_model=List[ProductResponse])
-def list_products(db: Session = Depends(get_db)):
+def list_products(
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """List all products."""
     products = db.query(Product).order_by(Product.created_at.desc()).all()
     return products
 
 
 @router.get("/{product_id}", response_model=ProductResponse)
-def get_product(product_id: int, db: Session = Depends(get_db)):
+def get_product(
+    product_id: int,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Get product by ID."""
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
@@ -185,6 +199,7 @@ def update_product(
     product_id: int,
     product_data: ProductUpdate,
     request: Request,
+    current_user: UserSession = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """
@@ -246,12 +261,26 @@ def update_product(
 
 
 @router.delete("/{product_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_product(product_id: int, request: Request, db: Session = Depends(get_db)):
+def delete_product(
+    product_id: int,
+    request: Request,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """
-    Delete a product.
+    Delete a product and all related data.
     
     Note: Product must be stopped before deletion.
+    
+    Deletes in order:
+    1. Activity logs  
+    2. Event subscriptions
+    3. Product record
+    
+    Note: Subscriptions cascade delete automatically via relationship.
     """
+    from orchestrator.database import ActivityLog
+    
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(
@@ -266,6 +295,13 @@ def delete_product(product_id: int, request: Request, db: Session = Depends(get_
         )
     
     product_name = product.name
+    
+    # Delete related data in correct order
+    
+    # 1. Delete activity logs
+    db.query(ActivityLog).filter(ActivityLog.product_id == product_id).delete()
+    
+    # 2. Delete product (subscriptions cascade automatically)
     db.delete(product)
     db.commit()
     logger.info(f"Deleted product '{product_name}' (ID: {product_id})")
@@ -292,7 +328,12 @@ def delete_product(product_id: int, request: Request, db: Session = Depends(get_
 
 # Orchestration endpoints
 @router.post("/{product_id}/start", response_model=ProductResponse)
-def start_product(product_id: int, request: Request, db: Session = Depends(get_db)):
+def start_product(
+    product_id: int,
+    request: Request,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Deploy product to Docker Swarm."""
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
@@ -380,7 +421,12 @@ def start_product(product_id: int, request: Request, db: Session = Depends(get_d
 
 
 @router.post("/{product_id}/stop", response_model=ProductResponse)
-def stop_product(product_id: int, request: Request, db: Session = Depends(get_db)):
+def stop_product(
+    product_id: int,
+    request: Request,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Stop and remove product from Docker Swarm."""
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
@@ -462,6 +508,7 @@ def scale_product(
     product_id: int,
     scale_data: ScaleRequest,
     request: Request,
+    current_user: UserSession = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     """Scale product to specified number of replicas."""
@@ -527,8 +574,84 @@ def scale_product(
         )
 
 
+@router.post("/{product_id}/generate-shared-key")
+def generate_product_shared_key(
+    product_id: int,
+    request: Request,
+    db: Session = Depends(get_db),
+):
+    """
+    Generate a new cryptographically secure shared key for the product.
+    
+    This key is used for instance-to-orchestrator authentication.
+    The key is automatically unique and cannot be duplicated across products.
+    """
+    from orchestrator.security import generate_shared_key, is_shared_key_unique
+    
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product {product_id} not found",
+        )
+    
+    # Generate unique key
+    max_attempts = 10
+    for _ in range(max_attempts):
+        new_key = generate_shared_key(length=64)  # 512-bit key
+        if is_shared_key_unique(db, new_key):
+            break
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to generate unique shared key after multiple attempts",
+        )
+    
+    old_key_masked = f"{product.shared_key[:16]}..." if product.shared_key else None
+    
+    # Update product
+    product.shared_key = new_key
+    db.commit()
+    db.refresh(product)
+    
+    logger.info(f"Generated new shared key for product '{product.name}'")
+    
+    # Log activity
+    log_activity(
+        db,
+        event_type="shared_key_generated",
+        message=f"New shared key generated for {product.name}",
+        product_id=product.id,
+        severity="info",
+        event_metadata={"action": "generate_shared_key"},
+    )
+    
+    # Log audit
+    log_audit(
+        db,
+        action="generate_shared_key",
+        resource_type="product",
+        resource_id=product.id,
+        resource_name=product.name,
+        changes={"shared_key": {"old": old_key_masked, "new": "generated"}},
+        request=request,
+        success=True,
+    )
+    
+    return {
+        "product_id": product.id,
+        "product_name": product.name,
+        "shared_key": new_key,
+        "message": "Shared key generated successfully. Store this securely - it cannot be retrieved again.",
+    }
+
+
 @router.get("/{product_id}/status")
-def get_product_status(product_id: int, db: Session = Depends(get_db)):
+def get_product_status(
+    product_id: int,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
     """Get detailed runtime status of product from Docker Swarm."""
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
@@ -571,10 +694,212 @@ def get_product_status(product_id: int, db: Session = Depends(get_db)):
         }
 
 
+@router.get("/{product_id}/logs/stream")
+def stream_product_logs(
+    product_id: int,
+    tail: int = 100,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Stream logs from a running product service using Server-Sent Events (SSE).
+    
+    Args:
+        tail: Number of initial log lines to return (default 100, max 1000)
+    
+    Returns:
+        StreamingResponse with text/event-stream content type
+    """
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product {product_id} not found",
+        )
+    
+    if not product.service_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Product '{product.name}' is not deployed",
+        )
+    
+    # Limit tail to prevent abuse
+    tail = min(tail, 1000)
+    
+    docker_manager = DockerManager()
+    
+    def event_generator():
+        """Generate SSE events from Docker log stream."""
+        try:
+            for log_line in docker_manager.stream_service_logs(product.service_id, tail=tail):
+                # Send each log line as an SSE event
+                yield f"data: {log_line}\n\n"
+        except NotFound:
+            yield f"event: error\ndata: Service not found\n\n"
+        except Exception as e:
+            logger.error(f"Error streaming logs: {e}")
+            yield f"event: error\ndata: {str(e)}\n\n"
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # Disable nginx buffering
+        }
+    )
+
+
+@router.post("/{product_id}/duplicate")
+def duplicate_product(
+    product_id: int,
+    new_name: str,
+    new_slug: str,
+    new_port: int,
+    request: Request,
+    db: Session = Depends(get_db)
+):
+    """
+    Duplicate an existing product with all its configuration.
+    
+    Creates a new product copying:
+    - Environment variables
+    - MQTT configuration (broker, subscriptions with actions)
+    - Replicas setting
+    - Docker image reference
+    
+    Does NOT copy:
+    - Shared key (generates new one if needed)
+    - Running state (new product starts as 'stopped')
+    - Service ID
+    """
+    from orchestrator.database import MQTTConfig, MQTTSubscription
+    
+    # Get source product
+    source_product = db.query(Product).filter(Product.id == product_id).first()
+    if not source_product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Source product {product_id} not found",
+        )
+    
+    # Validate new slug is unique
+    existing = db.query(Product).filter(Product.slug == new_slug).first()
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Product with slug '{new_slug}' already exists",
+        )
+    
+    # Validate new port is unique
+    existing_port = db.query(Product).filter(Product.port == new_port).first()
+    if existing_port:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Port {new_port} is already in use by product '{existing_port.name}'",
+        )
+    
+    # Create new product with copied data
+    new_product = Product(
+        name=new_name,
+        slug=new_slug,
+        port=new_port,
+        replicas=source_product.replicas,
+        env_vars=source_product.env_vars.copy() if source_product.env_vars else {},
+        image_id=source_product.image_id,
+        image_name=source_product.image_name,
+        status="stopped",
+    )
+    
+    try:
+        db.add(new_product)
+        db.flush()  # Get the new product ID
+        
+        # Copy event subscriptions if they exist
+        from orchestrator.database import EventSubscription
+        
+        source_subscriptions = db.query(EventSubscription).filter(
+            EventSubscription.product_id == source_product.id
+        ).all()
+        
+        subscriptions_copied = 0
+        for source_sub in source_subscriptions:
+            new_sub = EventSubscription(
+                product_id=new_product.id,
+                event_type=source_sub.event_type,
+                description=source_sub.description,
+                enabled=source_sub.enabled,
+                actions=source_sub.actions.copy() if source_sub.actions else [],
+            )
+            db.add(new_sub)
+            subscriptions_copied += 1
+        
+        db.commit()
+        db.refresh(new_product)
+        
+        logger.info(
+            f"Duplicated product '{source_product.name}' (ID: {source_product.id}) "
+            f"to '{new_product.name}' (ID: {new_product.id})"
+        )
+        
+        # Log activity
+        log_activity(
+            db,
+            event_type="product_duplicated",
+            message=f"{new_product.name} duplicated from {source_product.name}",
+            product_id=new_product.id,
+            severity="info",
+        )
+        
+        # Log audit
+        log_audit(
+            db,
+            action="duplicate_product",
+            resource_type="product",
+            resource_id=new_product.id,
+            resource_name=new_product.name,
+            changes={
+                "source_product_id": {"old": None, "new": source_product.id},
+                "source_product_name": {"old": None, "new": source_product.name},
+                "name": {"old": None, "new": new_product.name},
+                "slug": {"old": None, "new": new_product.slug},
+                "port": {"old": None, "new": new_product.port},
+            },
+            request=request,
+            success=True,
+        )
+        
+        # Return summary
+        return {
+            "id": new_product.id,
+            "name": new_product.name,
+            "slug": new_product.slug,
+            "port": new_product.port,
+            "replicas": new_product.replicas,
+            "status": new_product.status,
+            "image_name": new_product.image_name,
+            "env_vars": new_product.env_vars,
+            "created_at": new_product.created_at,
+            "source_product_id": source_product.id,
+            "source_product_name": source_product.name,
+            "subscriptions_copied": subscriptions_copied,
+        }
+        
+    except IntegrityError as e:
+        db.rollback()
+        logger.error(f"Failed to duplicate product: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Database constraint violation: {str(e)}",
+        )
+
+
 @router.get("/{product_id}/logs")
 def get_product_logs(
     product_id: int,
     tail: int = 100,
+    current_user: UserSession = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """

@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Optional
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, JSON, DateTime, ForeignKey, Integer, String, Text, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -102,6 +102,9 @@ class Product(Base):
     # Environment variables (stored as JSON key-value pairs)
     env_vars: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True, default=dict)
     
+    # Shared key for instance-to-orchestrator authentication (must be unique)
+    shared_key: Mapped[Optional[str]] = mapped_column(String(128), unique=True, nullable=True, index=True)
+    
     # Docker image reference (which image to deploy)
     image_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('docker_images.id'), nullable=True)
     image_name: Mapped[str] = mapped_column(String(255), default='bre-payments:latest', nullable=False)
@@ -121,6 +124,13 @@ class Product(Base):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False,
+    )
+    
+    # Relationships
+    subscriptions: Mapped[list["EventSubscription"]] = relationship(
+        "EventSubscription",
+        back_populates="product",
+        cascade="all, delete-orphan"
     )
 
     def __repr__(self) -> str:
@@ -216,3 +226,97 @@ class AuditLog(Base):
 
     def __repr__(self) -> str:
         return f"<AuditLog(id={self.id}, action='{self.action}', resource='{self.resource_type}:{self.resource_id}')>"
+
+
+class EventSubscription(Base):
+    """Event subscription configuration for business events."""
+    
+    __tablename__ = "event_subscriptions"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"), nullable=False, index=True)
+    
+    # Event type (e.g., 'order.created', 'payment.completed')
+    event_type: Mapped[str] = mapped_column(String(255), nullable=False)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+    # Actions configuration (JSON array of action objects)
+    # Example: [{"type": "webhook", "url": "...", "method": "POST"}]
+    actions: Mapped[Optional[list]] = mapped_column(JSON, nullable=True, default=list)
+    
+    # Execution statistics
+    messages_received: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_message_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    actions_executed: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    actions_failed: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    
+    # Metadata
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    
+    # Relationships
+    product: Mapped["Product"] = relationship("Product", back_populates="subscriptions")
+    
+    def to_dict(self):
+        """Convert to dictionary for API response."""
+        return {
+            "id": self.id,
+            "product_id": self.product_id,
+            "event_type": self.event_type,
+            "enabled": bool(self.enabled),
+            "description": self.description,
+            "actions": self.actions or [],
+            "stats": {
+                "messages_received": self.messages_received,
+                "last_message_at": self.last_message_at.isoformat() if self.last_message_at else None,
+                "actions_executed": self.actions_executed,
+                "actions_failed": self.actions_failed,
+            },
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class UserSession(Base):
+    """
+    User authentication sessions for orchestrator UI.
+    
+    Stores access tokens from Habit Platform authentication.
+    """
+    
+    __tablename__ = "user_sessions"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    access_token: Mapped[str] = mapped_column(String(512), unique=True, nullable=False, index=True)
+    refresh_token: Mapped[Optional[str]] = mapped_column(String(512), nullable=True)
+    
+    # Store complete user data from Habit Platform
+    user_data: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    
+    # Session tracking
+    last_login: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    last_activity: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    
+    def __repr__(self) -> str:
+        return f"<UserSession(email='{self.email}', last_login={self.last_login})>"
+
+
+# Export all models
+__all__ = [
+    "Base",
+    "OrchestratorSettings",
+    "DockerImage",
+    "Product",
+    "ActivityLog",
+    "AuditLog",
+    "EventSubscription",
+    "UserSession",
+]
