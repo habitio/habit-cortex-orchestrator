@@ -114,6 +114,7 @@ async def get_instance_subscriptions(
         "username": env_vars.get("MQTT_USERNAME"),
         "password": env_vars.get("MQTT_PASSWORD"),
         "topic_prefix": env_vars.get("MQTT_TOPIC_PREFIX", "/v3/applications"),
+        "use_shared_connections": env_vars.get("MQTT_USE_SHARED_SUBSCRIPTIONS", "false").lower() == "true",
         "shared_group": env_vars.get("MQTT_SHARED_GROUP", "bre"),
     }
     
@@ -170,7 +171,7 @@ async def get_instance_mqtt_config_legacy(
             "topics": {
                 "prefix": mqtt_config_data["topic_prefix"],
                 "pattern": f"{{{subscriptions_data['application_id']}}}/business-events" if subscriptions_data['application_id'] else "{application_id}/business-events",
-                "use_shared": True,
+                "use_shared": mqtt_config_data.get("use_shared_connections", False),
                 "shared_group": mqtt_config_data["shared_group"],
                 "qos": 1
             }
@@ -179,7 +180,7 @@ async def get_instance_mqtt_config_legacy(
             {
                 "id": sub["id"],
                 "name": sub["event_type"],  # Map event_type to name for legacy
-                "topic": f"{mqtt_config_data['topic_prefix']}/{subscriptions_data['application_id']}/business-events/{sub['event_type']}",
+                "topic": f"{mqtt_config_data['topic_prefix']}/{subscriptions_data['application_id']}/business-events/{sub['event_type'].replace('_', '-')}",
                 "enabled": sub["enabled"],
                 "description": sub["description"],
                 "actions": sub["actions"]
