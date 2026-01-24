@@ -755,6 +755,169 @@ def stream_product_logs(
     )
 
 
+@router.get("/{product_id}/logs/mqtt/stream")
+def stream_mqtt_logs(
+    product_id: int,
+    tail: int = 100,
+    current_user: UserSession = Depends(get_current_user_from_query),
+    db: Session = Depends(get_db)
+):
+    """
+    Stream MQTT-related logs using Server-Sent Events (SSE).
+    
+    Auth: Token must be provided as query parameter (?token=...) since SSE/EventSource
+          cannot set custom headers.
+    """
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product {product_id} not found",
+        )
+    
+    if not product.service_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Product '{product.name}' is not deployed",
+        )
+    
+    tail = min(tail, 1000)
+    docker_manager = DockerManager()
+    filter_pattern = r"(MQTT|mqtt|Connected|Subscribed|Received.*event|Starting MQTT listener)"
+    
+    def event_generator():
+        """Generate SSE events from Docker log stream with MQTT filter."""
+        try:
+            for log_line in docker_manager.stream_service_logs(product.service_id, tail=tail):
+                # Only send MQTT-related lines
+                if re.search(filter_pattern, log_line, re.IGNORECASE):
+                    yield f"data: {log_line}\n\n"
+        except NotFound:
+            yield f"event: error\ndata: Service not found\n\n"
+        except Exception as e:
+            logger.error(f"Error streaming logs: {e}")
+            yield f"event: error\ndata: {str(e)}\n\n"
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        }
+    )
+
+
+@router.get("/{product_id}/logs/events/stream")
+def stream_event_logs(
+    product_id: int,
+    tail: int = 100,
+    current_user: UserSession = Depends(get_current_user_from_query),
+    db: Session = Depends(get_db)
+):
+    """
+    Stream event processing logs using Server-Sent Events (SSE).
+    
+    Auth: Token must be provided as query parameter (?token=...) since SSE/EventSource
+          cannot set custom headers.
+    """
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product {product_id} not found",
+        )
+    
+    if not product.service_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Product '{product.name}' is not deployed",
+        )
+    
+    tail = min(tail, 1000)
+    docker_manager = DockerManager()
+    filter_pattern = r"(event.*received|Executing action|action.*executed|Error executing action|Processing.*event)"
+    
+    def event_generator():
+        """Generate SSE events from Docker log stream with event filter."""
+        try:
+            for log_line in docker_manager.stream_service_logs(product.service_id, tail=tail):
+                # Only send event-related lines
+                if re.search(filter_pattern, log_line, re.IGNORECASE):
+                    yield f"data: {log_line}\n\n"
+        except NotFound:
+            yield f"event: error\ndata: Service not found\n\n"
+        except Exception as e:
+            logger.error(f"Error streaming logs: {e}")
+            yield f"event: error\ndata: {str(e)}\n\n"
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        }
+    )
+
+
+@router.get("/{product_id}/logs/console/stream")
+def stream_console_logs(
+    product_id: int,
+    tail: int = 100,
+    current_user: UserSession = Depends(get_current_user_from_query),
+    db: Session = Depends(get_db)
+):
+    """
+    Stream application console logs using Server-Sent Events (SSE).
+    Excludes health checks and debug noise.
+    
+    Auth: Token must be provided as query parameter (?token=...) since SSE/EventSource
+          cannot set custom headers.
+    """
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Product {product_id} not found",
+        )
+    
+    if not product.service_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Product '{product.name}' is not deployed",
+        )
+    
+    tail = min(tail, 1000)
+    docker_manager = DockerManager()
+    exclude_pattern = r"(GET /health|GET /metrics|GET /readiness|GET /liveness|Starting gunicorn|Booting worker)"
+    
+    def event_generator():
+        """Generate SSE events from Docker log stream excluding health checks."""
+        try:
+            for log_line in docker_manager.stream_service_logs(product.service_id, tail=tail):
+                # Exclude health check and startup noise
+                if not re.search(exclude_pattern, log_line, re.IGNORECASE):
+                    yield f"data: {log_line}\n\n"
+        except NotFound:
+            yield f"event: error\ndata: Service not found\n\n"
+        except Exception as e:
+            logger.error(f"Error streaming logs: {e}")
+            yield f"event: error\ndata: {str(e)}\n\n"
+    
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        }
+    )
+
+
 @router.post("/{product_id}/duplicate")
 def duplicate_product(
     product_id: int,
