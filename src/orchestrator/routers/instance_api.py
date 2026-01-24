@@ -12,7 +12,7 @@ from fastapi import APIRouter, Header, HTTPException, status
 from sqlalchemy.orm import Session
 from fastapi import Depends
 
-from orchestrator.database import get_db, Product, EventSubscription
+from orchestrator.database import get_db, Product, EventSubscription, EmailTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -192,3 +192,32 @@ async def get_instance_mqtt_config_legacy(
     logger.info(f"Instance API (legacy): Product {product.id} fetched MQTT config")
     
     return legacy_format
+
+
+@router.get("/products/{product_id}/templates/email")
+async def get_instance_email_templates(
+    product: Product = Depends(verify_shared_key),
+    db: Session = Depends(get_db)
+):
+    """
+    Get email templates for a product instance.
+    
+    This endpoint is called by product instances using their shared key.
+    Returns all email templates for the product.
+    
+    **Authentication:** X-Cortex-Shared-Key header (not user session)
+    
+    Args:
+        product: Verified product from shared key
+        db: Database session
+        
+    Returns:
+        list: Email templates
+    """
+    templates = db.query(EmailTemplate)\
+        .filter(EmailTemplate.product_id == product.id)\
+        .all()
+    
+    logger.info(f"Instance API: Product {product.id} fetched {len(templates)} email templates")
+    
+    return [template.to_dict() for template in templates]
