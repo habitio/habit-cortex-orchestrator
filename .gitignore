@@ -30,6 +30,10 @@ dist/
 build/
 *.egg-info/
 
+# Build cache
+build-cache/
+orchestrator.db
+
 # OS
 .DS_Store
 Thumbs.db
