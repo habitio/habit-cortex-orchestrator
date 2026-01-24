@@ -36,6 +36,8 @@ class EmailTemplateCreate(BaseModel):
     description: Optional[str] = Field(None, description="Template description")
     template_type: str = Field(default="transactional", description="Template category")
     available_variables: list[str] = Field(default=[], description="Available template variables")
+    data_requirements: dict = Field(default={}, description="Data sources required by this template")
+    attachments_config: list = Field(default=[], description="Attachment configuration")
 
 
 class EmailTemplateUpdate(BaseModel):
@@ -47,6 +49,8 @@ class EmailTemplateUpdate(BaseModel):
     description: Optional[str] = None
     template_type: Optional[str] = None
     available_variables: Optional[list[str]] = None
+    data_requirements: Optional[dict] = None
+    attachments_config: Optional[list] = None
 
 
 # ListMonk Templates
@@ -174,7 +178,9 @@ async def create_email_template(
         body_text=template_data.body_text,
         description=template_data.description,
         template_type=template_data.template_type,
-        available_variables=template_data.available_variables
+        available_variables=template_data.available_variables,
+        data_requirements=template_data.data_requirements,
+        attachments_config=template_data.attachments_config
     )
     
     db.add(template)
@@ -257,14 +263,22 @@ async def update_email_template(
     # Update fields
     if template_data.name is not None:
         template.name = template_data.name
-    if template_data.listmonk_template_id is not None:
-        template.listmonk_template_id = template_data.listmonk_template_id
+    if template_data.subject is not None:
+        template.subject = template_data.subject
+    if template_data.body_html is not None:
+        template.body_html = template_data.body_html
+    if template_data.body_text is not None:
+        template.body_text = template_data.body_text
     if template_data.description is not None:
         template.description = template_data.description
     if template_data.template_type is not None:
         template.template_type = template_data.template_type
     if template_data.available_variables is not None:
         template.available_variables = template_data.available_variables
+    if template_data.data_requirements is not None:
+        template.data_requirements = template_data.data_requirements
+    if template_data.attachments_config is not None:
+        template.attachments_config = template_data.attachments_config
     
     db.commit()
     db.refresh(template)

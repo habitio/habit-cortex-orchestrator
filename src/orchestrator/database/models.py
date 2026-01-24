@@ -327,6 +327,14 @@ class EmailTemplate(Base):
     # Available variables (JSON array of variable names)
     available_variables: Mapped[Optional[list]] = mapped_column(JSON, nullable=True, default=list)
     
+    # Data requirements for template rendering (what data sources this template needs)
+    # Example: {"quote": ["quote_id"], "policyholder": ["name", "email"], "documents": ["policy_certificate"]}
+    data_requirements: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True, default=dict)
+    
+    # Attachment configuration
+    # Example: [{"type": "document", "source": "policy_document_id", "filename_template": "Policy_{{policy_code}}.pdf"}]
+    attachments_config: Mapped[Optional[list]] = mapped_column(JSON, nullable=True, default=list)
+    
     # Usage tracking
     times_used: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
@@ -350,6 +358,8 @@ class EmailTemplate(Base):
             "description": self.description,
             "template_type": self.template_type,
             "available_variables": self.available_variables or [],
+            "data_requirements": self.data_requirements or {},
+            "attachments_config": self.attachments_config or [],
             "stats": {
                 "times_used": self.times_used,
                 "last_used_at": self.last_used_at.isoformat() if self.last_used_at else None,
