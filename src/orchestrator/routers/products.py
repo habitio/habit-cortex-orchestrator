@@ -942,3 +942,127 @@ def get_product_logs(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Service not found (may have been removed)",
         )
+
+
+@router.get("/{product_id}/logs/mqtt")
+def get_mqtt_logs(
+    product_id: int,
+    tail: int = 500,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get MQTT-related logs (connections, subscriptions, events).
+    
+    Args:
+        tail: Number of log lines to fetch before filtering (default 500, max 2000)
+    """
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product {product_id} not found")
+    
+    if not product.service_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Product '{product.name}' is not deployed")
+    
+    tail = min(tail, 2000)
+    docker_manager = DockerManager()
+    
+    try:
+        # Filter for MQTT-related log lines
+        filter_pattern = r"(MQTT|mqtt|Connected|Subscribed|Received.*event|Starting MQTT listener)"
+        logs = docker_manager.get_filtered_logs(product.service_id, filter_pattern, tail=tail)
+        return {
+            "product_id": product.id,
+            "product_name": product.name,
+            "log_type": "mqtt",
+            "logs": logs,
+        }
+    except NotFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Service not found")
+
+
+@router.get("/{product_id}/logs/events")
+def get_event_logs(
+    product_id: int,
+    tail: int = 500,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get event processing logs (MQTT events, actions executed).
+    
+    Args:
+        tail: Number of log lines to fetch before filtering (default 500, max 2000)
+    """
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product {product_id} not found")
+    
+    if not product.service_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Product '{product.name}' is not deployed")
+    
+    tail = min(tail, 2000)
+    docker_manager = DockerManager()
+    
+    try:
+        # Filter for event processing log lines
+        filter_pattern = r"(event.*received|Executing action|action.*executed|Error executing action|Processing.*event)"
+        logs = docker_manager.get_filtered_logs(product.service_id, filter_pattern, tail=tail)
+        return {
+            "product_id": product.id,
+            "product_name": product.name,
+            "log_type": "events",
+            "logs": logs,
+        }
+    except NotFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Service not found")
+
+
+@router.get("/{product_id}/logs/console")
+def get_console_logs(
+    product_id: int,
+    tail: int = 200,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Get console/application logs (startup, errors, warnings - excludes health checks and debug).
+    
+    Args:
+        tail: Number of log lines to fetch before filtering (default 200, max 1000)
+    """
+    product = db.query(Product).filter(Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product {product_id} not found")
+    
+    if not product.service_id:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Product '{product.name}' is not deployed")
+    
+    tail = min(tail, 1000)
+    docker_manager = DockerManager()
+    
+    try:
+        # Get all logs then filter out health checks and debug noise
+        all_logs = docker_manager.get_service_logs(product.service_id, tail=tail)
+        lines = all_logs.split('\n')
+        
+        # Exclude health checks, quote simulations, and other noise
+        filtered_lines = [
+            line for line in lines
+            if not any(pattern in line for pattern in [
+                'GET /health',
+                '[AGE_DEBUG]',
+                '[ENTITY_FILTER]',
+                '[PAYMENT_BREAKDOWN]',
+                '[DOC_SERVICE]',
+            ])
+        ]
+        
+        return {
+            "product_id": product.id,
+            "product_name": product.name,
+            "log_type": "console",
+            "logs": '\n'.join(filtered_lines),
+        }
+    except NotFound:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Service not found")

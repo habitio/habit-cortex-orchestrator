@@ -291,3 +291,32 @@ class DockerManager:
         except APIError as e:
             logger.error(f"Failed to stream logs for service {service_id}: {e}")
             raise
+
+    def get_filtered_logs(self, service_id: str, filter_pattern: str, tail: int = 100) -> str:
+        """
+        Get logs from a Docker service with grep-like filtering.
+        
+        Args:
+            service_id: Docker service ID
+            filter_pattern: Regex pattern to filter log lines
+            tail: Number of lines to return from the end (before filtering)
+            
+        Returns:
+            Filtered service logs as string
+        """
+        import re
+        
+        try:
+            all_logs = self.get_service_logs(service_id, tail=tail)
+            lines = all_logs.split('\n')
+            
+            # Filter lines matching pattern (case-insensitive)
+            filtered_lines = [
+                line for line in lines 
+                if re.search(filter_pattern, line, re.IGNORECASE)
+            ]
+            
+            return '\n'.join(filtered_lines)
+        except Exception as e:
+            logger.error(f"Failed to filter logs for service {service_id}: {e}")
+            raise
