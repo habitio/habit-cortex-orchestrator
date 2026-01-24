@@ -7,6 +7,7 @@ from orchestrator.database.models import (
     AuditLog,
     EventSubscription,
     EmailTemplate,
+    ListMonkTemplate,
     SMSTemplate,
     UserSession,
 )
@@ -19,6 +20,7 @@ __all__ = [
     "AuditLog",
     "EventSubscription",
     "EmailTemplate",
+    "ListMonkTemplate",
     "SMSTemplate",
     "UserSession",
     "SessionLocal",

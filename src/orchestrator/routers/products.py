@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from orchestrator.database import Product, UserSession, get_db
-from orchestrator.routers.auth import get_current_user
+from orchestrator.routers.auth import get_current_user, get_current_user_from_query
 from orchestrator.services.docker_manager import DockerManager
 from orchestrator.utils.logging_helpers import log_activity, log_audit, calculate_changes
 
@@ -698,14 +698,18 @@ def get_product_status(
 def stream_product_logs(
     product_id: int,
     tail: int = 100,
-    current_user: UserSession = Depends(get_current_user),
+    current_user: UserSession = Depends(get_current_user_from_query),
     db: Session = Depends(get_db)
 ):
     """
     Stream logs from a running product service using Server-Sent Events (SSE).
     
+    Auth: Token must be provided as query parameter (?token=...) since SSE/EventSource
+          cannot set custom headers.
+    
     Args:
         tail: Number of initial log lines to return (default 100, max 1000)
+        token: Authentication token (query parameter)
     
     Returns:
         StreamingResponse with text/event-stream content type
@@ -774,8 +778,6 @@ def duplicate_product(
     - Running state (new product starts as 'stopped')
     - Service ID
     """
-    from orchestrator.database import MQTTConfig, MQTTSubscription
-    
     # Get source product
     source_product = db.query(Product).filter(Product.id == product_id).first()
     if not source_product:

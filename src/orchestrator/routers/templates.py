@@ -1,19 +1,21 @@
 """
 Templates API endpoints.
 
-Manages email and SMS templates for product instances.
-Email templates reference ListMonk template IDs.
-SMS templates store message content directly.
+Manages three types of templates for product instances:
+1. Email Templates - Custom email builder with subject and HTML body
+2. ListMonk Templates - References to external ListMonk template IDs  
+3. SMS Templates - Direct message storage with variable placeholders
 """
 
 import logging
+import re
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
-from orchestrator.database import get_db, EmailTemplate, SMSTemplate, Product
+from orchestrator.database import get_db, EmailTemplate, ListMonkTemplate, SMSTemplate, Product
 from orchestrator.database.models import UserSession
 from orchestrator.routers.auth import get_current_user
 
@@ -23,8 +25,33 @@ router = APIRouter(prefix="/api/v1/products/{product_id}/templates", tags=["temp
 
 
 # Pydantic schemas
+
+# Custom Email Templates
 class EmailTemplateCreate(BaseModel):
-    """Request model for creating an email template."""
+    """Request model for creating a custom email template."""
+    name: str = Field(..., min_length=1, max_length=255, description="Human-friendly template name")
+    subject: str = Field(..., min_length=1, max_length=500, description="Email subject line")
+    body_html: str = Field(..., min_length=1, description="HTML email body")
+    body_text: Optional[str] = Field(None, description="Plain text fallback")
+    description: Optional[str] = Field(None, description="Template description")
+    template_type: str = Field(default="transactional", description="Template category")
+    available_variables: list[str] = Field(default=[], description="Available template variables")
+
+
+class EmailTemplateUpdate(BaseModel):
+    """Request model for updating a custom email template."""
+    name: Optional[str] = Field(None, min_length=1, max_length=255)
+    subject: Optional[str] = Field(None, min_length=1, max_length=500)
+    body_html: Optional[str] = Field(None, min_length=1)
+    body_text: Optional[str] = None
+    description: Optional[str] = None
+    template_type: Optional[str] = None
+    available_variables: Optional[list[str]] = None
+
+
+# ListMonk Templates
+class ListMonkTemplateCreate(BaseModel):
+    """Request model for creating a ListMonk template reference."""
     name: str = Field(..., min_length=1, max_length=255, description="Human-friendly template name")
     listmonk_template_id: int = Field(..., gt=0, description="ListMonk template ID")
     description: Optional[str] = Field(None, description="Template description")
@@ -32,8 +59,8 @@ class EmailTemplateCreate(BaseModel):
     available_variables: list[str] = Field(default=[], description="Available template variables")
 
 
-class EmailTemplateUpdate(BaseModel):
-    """Request model for updating an email template."""
+class ListMonkTemplateUpdate(BaseModel):
+    """Request model for updating a ListMonk template reference."""
     name: Optional[str] = Field(None, min_length=1, max_length=255)
     listmonk_template_id: Optional[int] = Field(None, gt=0)
     description: Optional[str] = None
@@ -41,6 +68,7 @@ class EmailTemplateUpdate(BaseModel):
     available_variables: Optional[list[str]] = None
 
 
+# SMS Templates
 class SMSTemplateCreate(BaseModel):
     """Request model for creating an SMS template."""
     name: str = Field(..., min_length=1, max_length=255, description="Human-friendly template name")
@@ -69,6 +97,12 @@ def get_product_or_404(db: Session, product_id: int) -> Product:
             detail=f"Product {product_id} not found"
         )
     return product
+
+
+def extract_variables_from_html(html: str) -> list[str]:
+    """Extract {{variable}} placeholders from HTML content."""
+    pattern = r'\{\{([a-zA-Z_][a-zA-Z0-9_]*)\}\}'
+    return list(set(re.findall(pattern, html)))
 
 
 # ===== EMAIL TEMPLATES =====
@@ -103,9 +137,10 @@ async def create_email_template(
     db: Session = Depends(get_db)
 ):
     """
-    Create a new email template.
+    Create a new custom email template.
     
-    Email templates reference ListMonk template IDs.
+    Template name must be unique within the product.
+    Automatically extracts variables from subject and body.
     """
     # Verify product exists
     get_product_or_404(db, product_id)
@@ -124,11 +159,19 @@ async def create_email_template(
             detail=f"Email template '{template_data.name}' already exists for this product"
         )
     
+    # Auto-detect variables from content if not provided
+    if not template_data.available_variables:
+        subject_vars = extract_variables_from_html(template_data.subject)
+        body_vars = extract_variables_from_html(template_data.body_html)
+        template_data.available_variables = list(set(subject_vars + body_vars))
+    
     # Create template
     template = EmailTemplate(
         product_id=product_id,
         name=template_data.name,
-        listmonk_template_id=template_data.listmonk_template_id,
+        subject=template_data.subject,
+        body_html=template_data.body_html,
+        body_text=template_data.body_text,
         description=template_data.description,
         template_type=template_data.template_type,
         available_variables=template_data.available_variables
@@ -138,7 +181,7 @@ async def create_email_template(
     db.commit()
     db.refresh(template)
     
-    logger.info(f"Created email template '{template.name}' for product {product_id}")
+    logger.info(f"Created custom email template '{template.name}' for product {product_id}")
     
     return template.to_dict()
 
@@ -258,7 +301,167 @@ async def delete_email_template(
     db.delete(template)
     db.commit()
     
-    logger.info(f"Deleted email template {template_id} from product {product_id}")
+    logger.info(f"Deleted custom email template {template_id} from product {product_id}")
+
+
+# ===== LISTMONK TEMPLATES =====
+
+@router.get("/listmonk")
+async def list_listmonk_templates(
+    product_id: int,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    List all ListMonk template references for a product.
+    
+    Returns templates ordered by name.
+    """
+    get_product_or_404(db, product_id)
+    
+    templates = db.query(ListMonkTemplate)\
+        .filter(ListMonkTemplate.product_id == product_id)\
+        .order_by(ListMonkTemplate.name)\
+        .all()
+    
+    return [template.to_dict() for template in templates]
+
+
+@router.post("/listmonk", status_code=status.HTTP_201_CREATED)
+async def create_listmonk_template(
+    product_id: int,
+    template_data: ListMonkTemplateCreate,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new ListMonk template reference.
+    
+    Template name must be unique within the product.
+    """
+    get_product_or_404(db, product_id)
+    
+    # Check for duplicate name
+    existing = db.query(ListMonkTemplate)\
+        .filter(ListMonkTemplate.product_id == product_id, ListMonkTemplate.name == template_data.name)\
+        .first()
+    
+    if existing:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"ListMonk template '{template_data.name}' already exists for this product"
+        )
+    
+    template = ListMonkTemplate(
+        product_id=product_id,
+        name=template_data.name,
+        listmonk_template_id=template_data.listmonk_template_id,
+        description=template_data.description,
+        template_type=template_data.template_type,
+        available_variables=template_data.available_variables,
+    )
+    
+    db.add(template)
+    db.commit()
+    db.refresh(template)
+    
+    logger.info(f"Created ListMonk template '{template.name}' for product {product_id}")
+    return template.to_dict()
+
+
+@router.get("/listmonk/{template_id}")
+async def get_listmonk_template(
+    product_id: int,
+    template_id: int,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get a single ListMonk template reference by ID."""
+    get_product_or_404(db, product_id)
+    
+    template = db.query(ListMonkTemplate)\
+        .filter(ListMonkTemplate.id == template_id, ListMonkTemplate.product_id == product_id)\
+        .first()
+    
+    if not template:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"ListMonk template {template_id} not found"
+        )
+    
+    return template.to_dict()
+
+
+@router.put("/listmonk/{template_id}")
+async def update_listmonk_template(
+    product_id: int,
+    template_id: int,
+    updates: ListMonkTemplateUpdate,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Update a ListMonk template reference."""
+    get_product_or_404(db, product_id)
+    
+    template = db.query(ListMonkTemplate)\
+        .filter(ListMonkTemplate.id == template_id, ListMonkTemplate.product_id == product_id)\
+        .first()
+    
+    if not template:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"ListMonk template {template_id} not found"
+        )
+    
+    # Check for duplicate name if changing name
+    if updates.name and updates.name != template.name:
+        existing = db.query(ListMonkTemplate)\
+            .filter(ListMonkTemplate.product_id == product_id, ListMonkTemplate.name == updates.name)\
+            .first()
+        
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"ListMonk template '{updates.name}' already exists for this product"
+            )
+    
+    # Update fields
+    update_data = updates.dict(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(template, field, value)
+    
+    db.commit()
+    db.refresh(template)
+    
+    logger.info(f"Updated ListMonk template {template_id} for product {product_id}")
+    return template.to_dict()
+
+
+@router.delete("/listmonk/{template_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_listmonk_template(
+    product_id: int,
+    template_id: int,
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Delete a ListMonk template reference."""
+    get_product_or_404(db, product_id)
+    
+    template = db.query(ListMonkTemplate)\
+        .filter(ListMonkTemplate.id == template_id, ListMonkTemplate.product_id == product_id)\
+        .first()
+    
+    if not template:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"ListMonk template {template_id} not found"
+        )
+    
+    db.delete(template)
+    db.commit()
+    
+    logger.info(f"Deleted ListMonk template {template_id} for product {product_id}")
+    return None
 
 
 # ===== SMS TEMPLATES =====
@@ -313,6 +516,10 @@ async def create_sms_template(
             status_code=status.HTTP_409_CONFLICT,
             detail=f"SMS template '{template_data.name}' already exists for this product"
         )
+    
+    # Auto-detect variables if not provided
+    if not template_data.available_variables:
+        template_data.available_variables = extract_variables_from_html(template_data.message)
     
     # Calculate character count
     char_count = len(template_data.message)

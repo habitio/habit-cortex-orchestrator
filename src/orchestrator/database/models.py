@@ -137,6 +137,11 @@ class Product(Base):
         back_populates="product",
         cascade="all, delete-orphan"
     )
+    listmonk_templates: Mapped[list["ListMonkTemplate"]] = relationship(
+        "ListMonkTemplate",
+        back_populates="product",
+        cascade="all, delete-orphan"
+    )
     sms_templates: Mapped[list["SMSTemplate"]] = relationship(
         "SMSTemplate",
         back_populates="product",
@@ -290,13 +295,79 @@ class EventSubscription(Base):
 
 class EmailTemplate(Base):
     """
-    Email template reference to ListMonk.
+    Custom email template with subject and body content.
+    
+    Stores complete email content (subject, HTML body, plain text) with variable placeholders.
+    Templates are product-specific and referenced in event subscription actions.
+    """
+    
+    __tablename__ = "email_templates"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"), nullable=False, index=True)
+    
+    # Human-friendly name for UI
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    
+    # Email content
+    subject: Mapped[str] = mapped_column(String(500), nullable=False)
+    body_html: Mapped[str] = mapped_column(Text, nullable=False)  # HTML content
+    body_text: Mapped[Optional[str]] = mapped_column(Text, nullable=True)  # Plain text fallback
+    
+    # Optional description
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+    # Template type for categorization
+    template_type: Mapped[str] = mapped_column(
+        String(50),
+        default="transactional",
+        nullable=False
+    )  # transactional, marketing, notification, system
+    
+    # Available variables (JSON array of variable names)
+    available_variables: Mapped[Optional[list]] = mapped_column(JSON, nullable=True, default=list)
+    
+    # Usage tracking
+    times_used: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_used_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    # Metadata
+    created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
+    
+    # Relationships
+    product: Mapped["Product"] = relationship("Product", back_populates="email_templates")
+    
+    def to_dict(self):
+        """Convert to dictionary for API response."""
+        return {
+            "id": self.id,
+            "product_id": self.product_id,
+            "name": self.name,
+            "subject": self.subject,
+            "body_html": self.body_html,
+            "body_text": self.body_text,
+            "description": self.description,
+            "template_type": self.template_type,
+            "available_variables": self.available_variables or [],
+            "stats": {
+                "times_used": self.times_used,
+                "last_used_at": self.last_used_at.isoformat() if self.last_used_at else None,
+            },
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
+class ListMonkTemplate(Base):
+    """
+    ListMonk template reference.
     
     Stores human-friendly template names that map to ListMonk template IDs.
     Templates are product-specific and referenced in event subscription actions.
     """
     
-    __tablename__ = "email_templates"
+    __tablename__ = "listmonk_templates"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     product_id: Mapped[int] = mapped_column(Integer, ForeignKey("products.id"), nullable=False, index=True)
@@ -329,7 +400,7 @@ class EmailTemplate(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
     
     # Relationships
-    product: Mapped["Product"] = relationship("Product", back_populates="email_templates")
+    product: Mapped["Product"] = relationship("Product", back_populates="listmonk_templates")
     
     def to_dict(self):
         """Convert to dictionary for API response."""
@@ -457,6 +528,7 @@ __all__ = [
     "AuditLog",
     "EventSubscription",
     "EmailTemplate",
+    "ListMonkTemplate",
     "SMSTemplate",
     "UserSession",
 ]

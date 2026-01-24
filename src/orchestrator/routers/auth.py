@@ -10,7 +10,7 @@ from datetime import datetime
 from typing import Optional
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Header, status
+from fastapi import APIRouter, Depends, HTTPException, Header, Query, status
 from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 
@@ -142,6 +142,40 @@ def get_current_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid or expired token",
             headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Update last_activity
+    session.last_activity = datetime.utcnow()
+    db.commit()
+    
+    return session
+
+
+def get_current_user_from_query(
+    token: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+) -> UserSession:
+    """
+    Dependency to get current authenticated user from query parameter.
+    
+    Used for endpoints that cannot use Authorization headers (e.g., SSE streams).
+    Validates the token from ?token=<token> query parameter.
+    """
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing token query parameter",
+        )
+    
+    # Check if token exists in database
+    session = db.query(UserSession).filter(
+        UserSession.access_token == token
+    ).first()
+    
+    if not session:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired token",
         )
     
     # Update last_activity
