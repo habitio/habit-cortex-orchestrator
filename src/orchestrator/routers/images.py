@@ -405,3 +405,56 @@ def delete_image(
     db.commit()
     
     logger.info(f"Deleted image record: {image.name}:{image.tag} (ID: {image_id})")
+
+
+@router.post("/cleanup")
+def cleanup_unused_images(
+    current_user: UserSession = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Clean up Docker images that are not referenced by any product instance.
+    
+    This endpoint:
+    1. Scans all products (regardless of status) to identify images in use
+    2. Lists all Docker images on the system
+    3. Removes images not referenced by any product
+    
+    Returns:
+        Dictionary with cleanup statistics:
+        - images_checked: Total number of images examined
+        - images_removed: List of successfully removed images
+        - images_failed: List of images that failed to remove with error messages
+        - images_in_use: List of images currently referenced by products
+    
+    Note: System base images (python, alpine, ubuntu, etc.) are automatically skipped.
+    """
+    logger.info(f"User {current_user.username} initiated image cleanup")
+    
+    try:
+        # Initialize image build service
+        github_token = settings.github_token
+        image_service = ImageBuildService(github_token=github_token)
+        
+        # Run cleanup
+        result = image_service.cleanup_unused_images(db)
+        
+        logger.info(
+            f"Image cleanup completed: "
+            f"{len(result['images_removed'])} removed, "
+            f"{len(result['images_failed'])} failed, "
+            f"{len(result['images_in_use'])} in use"
+        )
+        
+        return {
+            "success": True,
+            "message": f"Cleanup completed. Removed {len(result['images_removed'])} unused images.",
+            "details": result
+        }
+        
+    except Exception as e:
+        logger.error(f"Image cleanup failed: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Image cleanup failed: {str(e)}"
+        )

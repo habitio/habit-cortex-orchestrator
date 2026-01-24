@@ -6,7 +6,7 @@ import shutil
 import tarfile
 import tempfile
 from pathlib import Path
-from typing import Callable
+from typing import Any, Callable
 
 import docker
 from docker.errors import APIError, BuildError
@@ -216,3 +216,82 @@ class ImageBuildService:
         except Exception as e:
             logger.error(f"Failed to remove image {image_name}: {e}")
             return False
+    
+    def cleanup_unused_images(self, db_session) -> dict[str, Any]:
+        """
+        Remove Docker images that are not referenced by any product instance.
+        
+        This method:
+        1. Queries all products to get their image_name values
+        2. Lists all Docker images with matching name patterns
+        3. Removes images not referenced by any product
+        
+        Args:
+            db_session: SQLAlchemy database session
+            
+        Returns:
+            Dictionary with cleanup results:
+            {
+                "images_checked": int,
+                "images_removed": List[str],
+                "images_failed": List[dict],
+                "images_in_use": List[str]
+            }
+        """
+        from orchestrator.database.models import Product
+        
+        result = {
+            "images_checked": 0,
+            "images_removed": [],
+            "images_failed": [],
+            "images_in_use": []
+        }
+        
+        try:
+            # Get all image_name values from products (regardless of status)
+            products = db_session.query(Product).all()
+            used_images = set()
+            
+            for product in products:
+                if product.image_name:
+                    used_images.add(product.image_name)
+                    logger.info(f"Product '{product.name}' (ID: {product.id}, status: {product.status}) uses image: {product.image_name}")
+            
+            logger.info(f"Found {len(used_images)} unique images in use by {len(products)} products")
+            result["images_in_use"] = sorted(list(used_images))
+            
+            # Get all Docker images (filter by common prefixes to avoid system images)
+            # Assuming instance images follow pattern like "bre-*" or custom names
+            all_images = self.docker_client.images.list()
+            
+            for image in all_images:
+                if not image.tags:
+                    continue
+                
+                for tag in image.tags:
+                    result["images_checked"] += 1
+                    
+                    # Skip system images and base images
+                    if any(tag.startswith(prefix) for prefix in ['python:', 'alpine:', 'ubuntu:', 'nginx:', 'postgres:', 'redis:']):
+                        continue
+                    
+                    # Check if this image is used by any product
+                    if tag not in used_images:
+                        logger.info(f"Image {tag} is not used by any product, attempting removal...")
+                        try:
+                            self.docker_client.images.remove(tag, force=False)
+                            result["images_removed"].append(tag)
+                            logger.info(f"✅ Successfully removed unused image: {tag}")
+                        except Exception as e:
+                            error_msg = str(e)
+                            result["images_failed"].append({"image": tag, "error": error_msg})
+                            logger.warning(f"❌ Failed to remove image {tag}: {error_msg}")
+                    else:
+                        logger.debug(f"Image {tag} is in use, skipping")
+            
+            logger.info(f"Cleanup complete: {len(result['images_removed'])} removed, {len(result['images_failed'])} failed, {len(result['images_in_use'])} in use")
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error during image cleanup: {e}")
+            raise
