@@ -76,8 +76,9 @@ class Settings(BaseSettings):
     
     # Build Configuration
     build_cache_dir: str = Field(
-        default="./build-cache",
+        default="/tmp/cortex-build-cache",
         description="Directory for storing temporary build files and caches",
+        env="BUILD_CACHE_DIR",
     )
     
     # GitHub Integration
