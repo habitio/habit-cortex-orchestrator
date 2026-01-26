@@ -171,13 +171,13 @@ async def list_product_specs(
     
     # Proxy to instance
     instance_url = f"http://localhost:{product.port}"
-    specs_data = await _proxy_to_instance(instance_url, "/internal/habit-specs/list")
+    services_data = await _proxy_to_instance(instance_url, "/internal/habit-specs/list")
     
-    # Add product context to response
+    # Add product context to Habit Platform response
     return {
         "product_id": product.id,
         "product_name": product.name,
-        **specs_data
+        **services_data  # Spread complete Habit Platform services response (elements, size, etc.)
     }
 
 
