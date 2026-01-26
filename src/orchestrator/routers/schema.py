@@ -482,3 +482,159 @@ async def get_common_template_variables() -> dict:
             "debug.all"
         ]
     }
+
+
+@router.get("/mqtt-action-conditions")
+async def get_mqtt_action_conditions(
+    _current_user: UserSession = Depends(get_current_user)
+) -> dict:
+    """
+    Get available condition fields for each MQTT action type.
+    
+    This endpoint provides metadata for the UI to dynamically build
+    condition forms for MQTT action configuration.
+    
+    Returns:
+        Dictionary mapping action types to their available condition fields,
+        including field types, descriptions, options, and defaults.
+    """
+    return {
+        "conditional_email": {
+            "description": "Send email via ListMonk with conditional logic",
+            "conditions": {
+                "payment_state": {
+                    "type": "select",
+                    "description": "Payment state (from payment object, not event)",
+                    "options": ["pending", "paid", "canceled", "refunded", "ANY"],
+                    "default": "ANY"
+                },
+                "payment_method": {
+                    "type": "multiselect",
+                    "description": "Payment method(s) allowed",
+                    "options": ["multibanco", "credit_card", "sepa_debit", "paypal", "mb_way"],
+                    "default": []
+                },
+                "payment_cdata_path": {
+                    "type": "text",
+                    "description": "Path to custom data in payment object (e.g., cdata.public.field)",
+                    "default": ""
+                },
+                "payment_cdata_value": {
+                    "type": "text",
+                    "description": "Expected value at cdata path",
+                    "default": ""
+                },
+                "payment_multibanco_exists": {
+                    "type": "boolean",
+                    "description": "Check if payment has Multibanco data",
+                    "default": False
+                },
+                "payment_tag": {
+                    "type": "text",
+                    "description": "Required payment tag (e.g., new_subscription, renewal)",
+                    "default": ""
+                },
+                "policy_new_state": {
+                    "type": "select",
+                    "description": "Policy new state (from event payload)",
+                    "options": ["pending", "active", "inactive", "canceled", "ANY"],
+                    "default": "ANY"
+                }
+            },
+            "supports_custom_conditions": False
+        },
+        "activate_policy": {
+            "description": "Mark policy as active in Habit Platform",
+            "conditions": {
+                "payment_new_state": {
+                    "type": "select",
+                    "description": "Payment new state from event",
+                    "options": ["pending", "paid", "canceled", "refunded", "ANY"],
+                    "default": "paid"
+                },
+                "payment_old_state": {
+                    "type": "select",
+                    "description": "Payment old state from event",
+                    "options": ["pending", "paid", "canceled", "refunded", "ANY"],
+                    "default": "ANY"
+                },
+                "payment_type": {
+                    "type": "select",
+                    "description": "Payment type from event",
+                    "options": ["subscription", "one-time", "renewal", "ANY"],
+                    "default": "ANY"
+                },
+                "policy_new_state": {
+                    "type": "select",
+                    "description": "Policy new state from event",
+                    "options": ["pending", "active", "inactive", "canceled", "ANY"],
+                    "default": "ANY"
+                },
+                "policy_old_state": {
+                    "type": "select",
+                    "description": "Policy old state from event",
+                    "options": ["pending", "active", "inactive", "canceled", "ANY"],
+                    "default": "ANY"
+                }
+            },
+            "supports_custom_conditions": True
+        },
+        "invalidate_smartlinks": {
+            "description": "Invalidate smart links for quote",
+            "conditions": {
+                "payment_new_state": {
+                    "type": "select",
+                    "description": "Payment new state from event",
+                    "options": ["pending", "paid", "canceled", "refunded", "ANY"],
+                    "default": "paid"
+                },
+                "payment_old_state": {
+                    "type": "select",
+                    "description": "Payment old state from event",
+                    "options": ["pending", "paid", "canceled", "refunded", "ANY"],
+                    "default": "ANY"
+                },
+                "payment_type": {
+                    "type": "select",
+                    "description": "Payment type from event",
+                    "options": ["subscription", "one-time", "renewal", "ANY"],
+                    "default": "ANY"
+                }
+            },
+            "supports_custom_conditions": True
+        },
+        "create_invoice": {
+            "description": "Create invoice in Moloni system",
+            "conditions": {
+                "payment_new_state": {
+                    "type": "select",
+                    "description": "Payment new state from event",
+                    "options": ["pending", "paid", "canceled", "refunded", "ANY"],
+                    "default": "paid"
+                },
+                "payment_old_state": {
+                    "type": "select",
+                    "description": "Payment old state from event",
+                    "options": ["pending", "paid", "canceled", "refunded", "ANY"],
+                    "default": "ANY"
+                },
+                "payment_type": {
+                    "type": "select",
+                    "description": "Payment type from event",
+                    "options": ["subscription", "one-time", "renewal", "ANY"],
+                    "default": "ANY"
+                }
+            },
+            "supports_custom_conditions": True
+        },
+        "smtp_email": {
+            "description": "Send email via SMTP",
+            "conditions": {},
+            "supports_custom_conditions": True
+        },
+        "healthcheck_response": {
+            "description": "Respond to MQTT healthcheck",
+            "conditions": {},
+            "supports_custom_conditions": False
+        }
+    }

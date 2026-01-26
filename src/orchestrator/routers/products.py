@@ -1133,7 +1133,7 @@ def get_mqtt_logs(
     
     try:
         # Filter for MQTT-related log lines
-        filter_pattern = r"(MQTT|mqtt|Connected|Subscribed|Received.*event|Starting MQTT listener)"
+        filter_pattern = r"(MQTT|mqtt|Connected|Subscribed|Received|Starting.*listener|🚀|📝|✅|🔌|🔄|✓|✗|topic)"
         logs = docker_manager.get_filtered_logs(product.service_id, filter_pattern, tail=tail)
         return {
             "product_id": product.id,

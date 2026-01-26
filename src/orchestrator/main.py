@@ -14,6 +14,7 @@ from orchestrator.routers.audit import router as audit_router
 from orchestrator.routers.auth import router as auth_router
 from orchestrator.routers.images import router as images_router
 from orchestrator.routers.instance_api import router as instance_api_router
+from orchestrator.routers.product_specs import router as product_specs_router
 from orchestrator.routers.schema import router as schema_router
 from orchestrator.routers.subscriptions import router as subscriptions_router
 from orchestrator.routers.templates import router as templates_router
@@ -50,6 +51,7 @@ app.include_router(health_router)
 app.include_router(auth_router)
 app.include_router(instance_api_router)  # Public API for instances (shared key auth)
 app.include_router(products_router)
+app.include_router(product_specs_router)  # Product specs (read-only from Habit Platform)
 app.include_router(subscriptions_router)
 app.include_router(templates_router)
 app.include_router(schema_router)  # Schema/metadata for UI
