@@ -238,3 +238,67 @@ async def get_product_spec(
     """
     instance_url = await _get_instance_url(product_id, db)
     return await _proxy_to_instance(instance_url, f"/internal/habit-specs/{spec_id}")
+
+
+@router.get("/{service_id}/quote-specs")
+async def get_service_quote_specs(
+    product_id: int,
+    service_id: str,
+    db: Session = Depends(get_db),
+    _current_user: UserSession = Depends(get_current_user)
+) -> dict[str, Any]:
+    """
+    Get quote-specs for a specific service from Habit Platform.
+    
+    This endpoint returns the raw quote-specs structure from Habit Platform,
+    including all property specifications for quotes, insurees, and protected assets.
+    
+    Args:
+        product_id: Product ID
+        service_id: Service/spec UUID
+        
+    Returns:
+        Dictionary containing:
+        - quotepropertyspecs: Array of quote property specifications
+        - insureepropertyspecs: Array of insuree property specifications
+        - protectedassetpropertyspecs: Array of protected asset property specifications
+        
+    Each property spec includes:
+        - namespace: Property identifier (e.g., "num_tyres", "coverage_level")
+        - classes: Array of class identifiers (e.g., "io.habit.operations.required.quotes.simulate")
+        - options: Array of allowed values (if applicable)
+        - label: Human-readable label
+        
+    Example response:
+        {
+            "quotepropertyspecs": [
+                {
+                    "namespace": "num_tyres",
+                    "label": "Number of Tyres",
+                    "classes": ["io.habit.operations.required.quotes.simulate"],
+                    "options": [
+                        {"data": 2, "label": "2 tyres"},
+                        {"data": 4, "label": "4 tyres"}
+                    ]
+                }
+            ],
+            "insureepropertyspecs": [...],
+            "protectedassetpropertyspecs": [...]
+        }
+    """
+    instance_url = await _get_instance_url(product_id, db)
+    
+    # Add product context to response
+    product = db.query(Product).filter(Product.id == product_id).first()
+    
+    specs_data = await _proxy_to_instance(
+        instance_url, 
+        f"/internal/habit-specs/{service_id}/quote-specs"
+    )
+    
+    return {
+        "product_id": product_id,
+        "product_name": product.name,
+        "service_id": service_id,
+        **specs_data
+    }
