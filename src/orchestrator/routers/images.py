@@ -177,38 +177,48 @@ def create_image_build(
     
     if existing:
         if build_request.force_rebuild:
-            logger.info(f"Force rebuild requested - deleting existing image {full_image_name} (ID: {existing.id})")
-            # Delete Docker image if it exists
+            logger.info(f"Force rebuild requested - removing existing Docker image {full_image_name}")
+            # Delete Docker image if it exists (but keep database record)
             try:
                 from orchestrator.services.docker_manager import DockerManager
                 docker_manager = DockerManager()
-                docker_manager.docker_client.images.remove(full_image_name, force=True)
+                docker_manager.client.images.remove(full_image_name, force=True)
                 logger.info(f"Deleted Docker image: {full_image_name}")
             except Exception as e:
                 logger.warning(f"Could not delete Docker image {full_image_name}: {e}")
             
-            # Delete database record
-            db.delete(existing)
+            # Update existing record to rebuild
+            existing.build_status = "pending"
+            existing.github_repo = build_request.repo
+            existing.github_ref = f"refs/tags/{build_request.tag}"
+            existing.commit_sha = build_request.commit_sha
+            existing.build_started_at = None
+            existing.build_completed_at = None
+            existing.build_logs = None
             db.commit()
-            logger.info(f"Deleted database record for {full_image_name}")
+            db.refresh(existing)
+            
+            logger.info(f"Updated existing image record for rebuild: {full_image_name} (ID: {existing.id})")
+            image = existing
         else:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=f"Image {full_image_name} already exists with ID {existing.id}. Use force_rebuild=true to overwrite.",
             )
-    
-    image = DockerImage(
-        name=build_request.image_name,
-        tag=build_request.tag,
-        github_repo=build_request.repo,
-        github_ref=f"refs/tags/{build_request.tag}",
-        commit_sha=build_request.commit_sha,
-        build_status="pending",
-    )
-    
-    db.add(image)
-    db.commit()
-    db.refresh(image)
+    else:
+        # Create new image record
+        image = DockerImage(
+            name=build_request.image_name,
+            tag=build_request.tag,
+            github_repo=build_request.repo,
+            github_ref=f"refs/tags/{build_request.tag}",
+            commit_sha=build_request.commit_sha,
+            build_status="pending",
+        )
+        
+        db.add(image)
+        db.commit()
+        db.refresh(image)
     
     logger.info(f"Created image build record: {full_image_name} (ID: {image.id})")
     
