@@ -71,6 +71,7 @@ class ImageBuildRequest(BaseModel):
     commit_sha: str = Field(..., description="Commit SHA for verification")
     image_name: str = Field(default="bre-payments", description="Base image name")
     dockerfile_path: str = Field(default="Dockerfile", description="Path to Dockerfile relative to repo root (e.g., 'Dockerfile' or 'cortex-orchestrator/Dockerfile')")
+    force_rebuild: bool = Field(default=False, description="Force rebuild by deleting existing image with same tag")
 
 
 class ImageResponse(BaseModel):
@@ -175,10 +176,26 @@ def create_image_build(
     ).first()
     
     if existing:
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail=f"Image {full_image_name} already exists with ID {existing.id}",
-        )
+        if build_request.force_rebuild:
+            logger.info(f"Force rebuild requested - deleting existing image {full_image_name} (ID: {existing.id})")
+            # Delete Docker image if it exists
+            try:
+                from orchestrator.services.docker_manager import DockerManager
+                docker_manager = DockerManager()
+                docker_manager.docker_client.images.remove(full_image_name, force=True)
+                logger.info(f"Deleted Docker image: {full_image_name}")
+            except Exception as e:
+                logger.warning(f"Could not delete Docker image {full_image_name}: {e}")
+            
+            # Delete database record
+            db.delete(existing)
+            db.commit()
+            logger.info(f"Deleted database record for {full_image_name}")
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Image {full_image_name} already exists with ID {existing.id}. Use force_rebuild=true to overwrite.",
+            )
     
     image = DockerImage(
         name=build_request.image_name,
