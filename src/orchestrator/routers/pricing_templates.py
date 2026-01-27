@@ -5,12 +5,11 @@ Provides CRUD endpoints for managing pricing calculation templates.
 """
 
 import logging
-from typing import List, Optional
+from typing import List, Optional, Any, Dict
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 
-from ..database.session import get_db
+from ..database import get_db
 from ..database.models import PricingTemplate, Product
 from ..routers.auth import get_current_user
 
@@ -25,13 +24,13 @@ router = APIRouter(prefix="/api/v1", tags=["pricing-templates"])
 
 
 @router.get("/products/{product_id}/pricing-templates")
-async def list_pricing_templates(
+def list_pricing_templates(
     product_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
     is_active: Optional[bool] = None,
     strategy: Optional[str] = None
-):
+) -> Dict[str, Any]:
     """
     List all pricing templates for a product.
     
@@ -40,24 +39,22 @@ async def list_pricing_templates(
     - strategy: Filter by strategy name
     """
     # Verify product exists
-    product_result = await db.execute(select(Product).where(Product.id == product_id))
-    product = product_result.scalar_one_or_none()
+    product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
     
     # Build query
-    query = select(PricingTemplate).where(PricingTemplate.product_id == product_id)
+    query = db.query(PricingTemplate).filter(PricingTemplate.product_id == product_id)
     
     if is_active is not None:
-        query = query.where(PricingTemplate.is_active == is_active)
+        query = query.filter(PricingTemplate.is_active == is_active)
     
     if strategy:
-        query = query.where(PricingTemplate.strategy == strategy)
+        query = query.filter(PricingTemplate.strategy == strategy)
     
     query = query.order_by(PricingTemplate.name)
     
-    result = await db.execute(query)
-    templates = result.scalars().all()
+    templates = query.all()
     
     return {
         "templates": [template.to_dict() for template in templates],
@@ -66,20 +63,17 @@ async def list_pricing_templates(
 
 
 @router.get("/products/{product_id}/pricing-templates/{template_id}")
-async def get_pricing_template(
+def get_pricing_template(
     product_id: int,
     template_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
-):
+) -> Dict[str, Any]:
     """Get a specific pricing template by ID."""
-    result = await db.execute(
-        select(PricingTemplate).where(
-            PricingTemplate.id == template_id,
-            PricingTemplate.product_id == product_id
-        )
-    )
-    template = result.scalar_one_or_none()
+    template = db.query(PricingTemplate).filter(
+        PricingTemplate.id == template_id,
+        PricingTemplate.product_id == product_id
+    ).first()
     
     if not template:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pricing template not found")
@@ -88,12 +82,12 @@ async def get_pricing_template(
 
 
 @router.post("/products/{product_id}/pricing-templates", status_code=status.HTTP_201_CREATED)
-async def create_pricing_template(
+def create_pricing_template(
     product_id: int,
     name: str,
     strategy: str,
     strategy_config: dict,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
     description: Optional[str] = None,
     strategy_version: str = "1.0.0",
@@ -113,8 +107,7 @@ async def create_pricing_template(
     - distributor_id: Optional distributor override
     """
     # Verify product exists
-    product_result = await db.execute(select(Product).where(Product.id == product_id))
-    product = product_result.scalar_one_or_none()
+    product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
     
@@ -131,8 +124,8 @@ async def create_pricing_template(
     )
     
     db.add(template)
-    await db.commit()
-    await db.refresh(template)
+    db.commit()
+    db.refresh(template)
     
     logger.info(f"Created pricing template: {template.name} (ID: {template.id}) for product {product_id}")
     
@@ -140,10 +133,10 @@ async def create_pricing_template(
 
 
 @router.put("/products/{product_id}/pricing-templates/{template_id}")
-async def update_pricing_template(
+def update_pricing_template(
     product_id: int,
     template_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user),
     name: Optional[str] = None,
     description: Optional[str] = None,
@@ -158,13 +151,10 @@ async def update_pricing_template(
     
     Only provided fields will be updated.
     """
-    result = await db.execute(
-        select(PricingTemplate).where(
-            PricingTemplate.id == template_id,
-            PricingTemplate.product_id == product_id
-        )
-    )
-    template = result.scalar_one_or_none()
+    template = db.query(PricingTemplate).filter(
+        PricingTemplate.id == template_id,
+        PricingTemplate.product_id == product_id
+    ).first()
     
     if not template:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pricing template not found")
@@ -185,8 +175,8 @@ async def update_pricing_template(
     if distributor_id is not None:
         template.distributor_id = distributor_id
     
-    await db.commit()
-    await db.refresh(template)
+    db.commit()
+    db.refresh(template)
     
     logger.info(f"Updated pricing template: {template.name} (ID: {template.id})")
     
@@ -194,10 +184,10 @@ async def update_pricing_template(
 
 
 @router.delete("/products/{product_id}/pricing-templates/{template_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_pricing_template(
+def delete_pricing_template(
     product_id: int,
     template_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ):
     """
@@ -206,19 +196,16 @@ async def delete_pricing_template(
     WARNING: This will break workflows that reference this template.
     Consider setting is_active=false instead.
     """
-    result = await db.execute(
-        select(PricingTemplate).where(
-            PricingTemplate.id == template_id,
-            PricingTemplate.product_id == product_id
-        )
-    )
-    template = result.scalar_one_or_none()
+    template = db.query(PricingTemplate).filter(
+        PricingTemplate.id == template_id,
+        PricingTemplate.product_id == product_id
+    ).first()
     
     if not template:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pricing template not found")
     
-    await db.delete(template)
-    await db.commit()
+    db.delete(template)
+    db.commit()
     
     logger.info(f"Deleted pricing template: {template.name} (ID: {template.id})")
     
@@ -231,10 +218,10 @@ async def delete_pricing_template(
 
 
 @router.get("/public/products/{product_id}/pricing-templates/{template_id}")
-async def get_pricing_template_public(
+def get_pricing_template_public(
     product_id: int,
     template_id: int,
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ):
     """
     Get a specific pricing template (public endpoint for instances).
@@ -242,14 +229,11 @@ async def get_pricing_template_public(
     This endpoint is called by product instances to fetch pricing templates
     during workflow execution.
     """
-    result = await db.execute(
-        select(PricingTemplate).where(
-            PricingTemplate.id == template_id,
-            PricingTemplate.product_id == product_id,
-            PricingTemplate.is_active == True
-        )
-    )
-    template = result.scalar_one_or_none()
+    template = db.query(PricingTemplate).filter(
+        PricingTemplate.id == template_id,
+        PricingTemplate.product_id == product_id,
+        PricingTemplate.is_active == True
+    ).first()
     
     if not template:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pricing template not found or inactive")
@@ -258,9 +242,9 @@ async def get_pricing_template_public(
 
 
 @router.get("/public/products/{product_id}/pricing-templates")
-async def list_pricing_templates_public(
+def list_pricing_templates_public(
     product_id: int,
-    db: AsyncSession = Depends(get_db),
+    db: Session = Depends(get_db),
     strategy: Optional[str] = None
 ):
     """
@@ -269,18 +253,17 @@ async def list_pricing_templates_public(
     Query parameters:
     - strategy: Filter by strategy name
     """
-    query = select(PricingTemplate).where(
+    query = db.query(PricingTemplate).filter(
         PricingTemplate.product_id == product_id,
         PricingTemplate.is_active == True
     )
     
     if strategy:
-        query = query.where(PricingTemplate.strategy == strategy)
+        query = query.filter(PricingTemplate.strategy == strategy)
     
     query = query.order_by(PricingTemplate.name)
     
-    result = await db.execute(query)
-    templates = result.scalars().all()
+    templates = query.all()
     
     return {
         "templates": [template.to_dict() for template in templates],
