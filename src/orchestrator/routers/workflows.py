@@ -197,8 +197,14 @@ async def get_available_workflow_steps(
             detail=f"Product with ID {product_id} not found"
         )
     
-    # Proxy to instance
-    instance_url = f"http://localhost:{product.port}/internal/habit-specs/workflow-steps"
+    # Proxy to instance - use docker host IP (works for swarm services with published ports)
+    # Since orchestrator runs on host and can't resolve docker service names,
+    # we use the host machine's IP address to reach the published port
+    import socket
+    host_ip = socket.gethostbyname(socket.gethostname())
+    instance_url = f"http://{host_ip}:{product.port}/internal/habit-specs/workflow-steps"
+    
+    logger.info(f"Fetching workflow steps from: {instance_url}")
     
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
