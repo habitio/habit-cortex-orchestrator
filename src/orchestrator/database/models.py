@@ -528,6 +528,74 @@ class UserSession(Base):
         return f"<UserSession(email='{self.email}', last_login={self.last_login})>"
 
 
+class ProductWorkflow(Base):
+    """
+    Product workflow definitions.
+    
+    Stores the visual workflow configuration for each product endpoint.
+    Each workflow is a JSON definition of steps (boxes) to execute in sequence.
+    
+    Example workflow JSON:
+    {
+        "endpoint": "quote_simulate",
+        "steps": [
+            {
+                "id": "step-1",
+                "type": "fetch_quote",
+                "config": {}
+            },
+            {
+                "id": "step-2",
+                "type": "validate_required_properties",
+                "config": {"strict": true}
+            },
+            {
+                "id": "step-3",
+                "type": "calculate_premium",
+                "config": {"service": "quote_simulation"}
+            }
+        ]
+    }
+    """
+    
+    __tablename__ = "product_workflows"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey('products.id'), nullable=False, index=True)
+    
+    # Endpoint this workflow applies to
+    endpoint: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    # Examples: quote_setup, quote_simulate, quote_checkout, policy_checkout, custom_action:calculate-price
+    
+    # Workflow definition (visual flow boxes)
+    workflow_definition: Mapped[dict] = mapped_column(JSON, nullable=False)
+    
+    # Version for tracking changes
+    version: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
+    
+    # Whether this workflow is active/enabled
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    
+    # Audit timestamps
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+    
+    # Relationship
+    product: Mapped["Product"] = relationship("Product")
+    
+    def __repr__(self) -> str:
+        return f"<ProductWorkflow(id={self.id}, product_id={self.product_id}, endpoint='{self.endpoint}', version={self.version})>"
+
+
 # Export all models
 __all__ = [
     "Base",
@@ -541,4 +609,5 @@ __all__ = [
     "ListMonkTemplate",
     "SMSTemplate",
     "UserSession",
+    "ProductWorkflow",
 ]

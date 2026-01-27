@@ -18,6 +18,7 @@ from orchestrator.routers.product_specs import router as product_specs_router
 from orchestrator.routers.schema import router as schema_router
 from orchestrator.routers.subscriptions import router as subscriptions_router
 from orchestrator.routers.templates import router as templates_router
+from orchestrator.routers.workflows import router as workflows_router
 
 # Configure logging
 logging.basicConfig(
@@ -53,6 +54,7 @@ app.include_router(instance_api_router)  # Public API for instances (shared key 
 app.include_router(products_router)
 app.include_router(product_specs_router)  # Product specs (read-only from Habit Platform)
 app.include_router(subscriptions_router)
+app.include_router(workflows_router)  # Product workflows (visual flow builder)
 app.include_router(templates_router)
 app.include_router(schema_router)  # Schema/metadata for UI
 app.include_router(images_router)

@@ -3,6 +3,7 @@
 from orchestrator.database.models import (
     Base,
     Product,
+    ProductWorkflow,
     ActivityLog,
     AuditLog,
     EventSubscription,
@@ -16,6 +17,7 @@ from orchestrator.database.session import SessionLocal, engine, get_db
 __all__ = [
     "Base",
     "Product",
+    "ProductWorkflow",
     "ActivityLog",
     "AuditLog",
     "EventSubscription",
