@@ -16,11 +16,13 @@ from orchestrator.routers.business_rules import router as business_rules_router
 from orchestrator.routers.images import router as images_router
 from orchestrator.routers.instance_api import router as instance_api_router
 from orchestrator.routers.pricing_templates import router as pricing_templates_router
+from orchestrator.routers.pricing_strategies import router as pricing_strategies_router
 from orchestrator.routers.product_specs import router as product_specs_router
 from orchestrator.routers.schema import router as schema_router
 from orchestrator.routers.subscriptions import router as subscriptions_router
 from orchestrator.routers.templates import router as templates_router
 from orchestrator.routers.workflows import router as workflows_router
+from orchestrator.routers.workflow_step_types import router as workflow_step_types_router
 
 # Configure logging
 logging.basicConfig(
@@ -57,8 +59,10 @@ app.include_router(products_router)
 app.include_router(product_specs_router)  # Product specs (read-only from Habit Platform)
 app.include_router(subscriptions_router)
 app.include_router(workflows_router)  # Product workflows (visual flow builder)
+app.include_router(workflow_step_types_router)  # Workflow step type metadata for UI
 app.include_router(business_rules_router)  # Business rules management
 app.include_router(pricing_templates_router)  # Pricing templates management
+app.include_router(pricing_strategies_router)  # Pricing strategies metadata for UI
 app.include_router(templates_router)
 app.include_router(schema_router)  # Schema/metadata for UI
 app.include_router(images_router)
