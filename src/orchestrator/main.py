@@ -12,6 +12,7 @@ from orchestrator.routers.activity import router as activity_router
 from orchestrator.routers.admin import router as admin_router
 from orchestrator.routers.audit import router as audit_router
 from orchestrator.routers.auth import router as auth_router
+from orchestrator.routers.business_rules import router as business_rules_router
 from orchestrator.routers.images import router as images_router
 from orchestrator.routers.instance_api import router as instance_api_router
 from orchestrator.routers.product_specs import router as product_specs_router
@@ -55,6 +56,7 @@ app.include_router(products_router)
 app.include_router(product_specs_router)  # Product specs (read-only from Habit Platform)
 app.include_router(subscriptions_router)
 app.include_router(workflows_router)  # Product workflows (visual flow builder)
+app.include_router(business_rules_router)  # Business rules management
 app.include_router(templates_router)
 app.include_router(schema_router)  # Schema/metadata for UI
 app.include_router(images_router)

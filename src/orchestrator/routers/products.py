@@ -983,7 +983,7 @@ def duplicate_product(
         db.flush()  # Get the new product ID
         
         # Copy event subscriptions if they exist
-        from orchestrator.database import EventSubscription
+        from orchestrator.database import EventSubscription, ProductWorkflow
         
         source_subscriptions = db.query(EventSubscription).filter(
             EventSubscription.product_id == source_product.id
@@ -1000,6 +1000,23 @@ def duplicate_product(
             )
             db.add(new_sub)
             subscriptions_copied += 1
+        
+        # Copy workflows if they exist
+        source_workflows = db.query(ProductWorkflow).filter(
+            ProductWorkflow.product_id == source_product.id
+        ).all()
+        
+        workflows_copied = 0
+        for source_workflow in source_workflows:
+            new_workflow = ProductWorkflow(
+                product_id=new_product.id,
+                endpoint=source_workflow.endpoint,
+                workflow_definition=source_workflow.workflow_definition.copy() if source_workflow.workflow_definition else {},
+                version=1,  # Reset version to 1 for new product
+                is_active=source_workflow.is_active,
+            )
+            db.add(new_workflow)
+            workflows_copied += 1
         
         db.commit()
         db.refresh(new_product)
@@ -1050,6 +1067,7 @@ def duplicate_product(
             "source_product_id": source_product.id,
             "source_product_name": source_product.name,
             "subscriptions_copied": subscriptions_copied,
+            "workflows_copied": workflows_copied,
         }
         
     except IntegrityError as e:

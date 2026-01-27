@@ -292,7 +292,7 @@ async def update_workflow(
         event_type="workflow_updated",
         message=f"Workflow updated for endpoint '{workflow.endpoint}' on product '{product.name}'",
         severity="info",
-        metadata={
+        event_metadata={
             "endpoint": workflow.endpoint,
             "workflow_id": workflow.id,
             "version": workflow.version
@@ -302,12 +302,12 @@ async def update_workflow(
     # Log audit
     log_audit(
         db=db,
-        user_email=current_user.email,
+        user_id=current_user.email,
         action="update",
         resource_type="workflow",
         resource_id=workflow.id,
-        changes=changes,
-        metadata={"product_id": product_id, "endpoint": workflow.endpoint}
+        resource_name=f"{product.name} - {workflow.endpoint}",
+        changes=changes
     )
     
     logger.info(f"Updated workflow {workflow.id}, now version {workflow.version}")

@@ -596,6 +596,99 @@ class ProductWorkflow(Base):
         return f"<ProductWorkflow(id={self.id}, product_id={self.product_id}, endpoint='{self.endpoint}', version={self.version})>"
 
 
+class BusinessRule(Base):
+    """
+    Business validation rules for products.
+    
+    Replaces JSON-based configuration with database-driven, manageable rules.
+    Rules can be visually created, edited, and selected in workflow steps.
+    
+    Example rule:
+    {
+        "rule_type": "field_validation",
+        "entity": "insuree",
+        "property": "birthdate",
+        "operator": "age_between",
+        "value": [18, 75],
+        "apply_to": "latest",
+        "error_code": 9531,
+        "error_message": "Insuree age must be between 18 and 75 years old",
+        "skip_if_missing": true
+    }
+    """
+    
+    __tablename__ = "business_rules"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey('products.id'), nullable=False, index=True)
+    
+    # Human-friendly name for UI (e.g., "Age Validation 18-75")
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    
+    # Optional description
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+    # Rule type for categorization
+    rule_type: Mapped[str] = mapped_column(
+        String(50),
+        default="field_validation",
+        nullable=False,
+        index=True
+    )  # field_validation, cross_field_validation, business_logic, etc.
+    
+    # Rule definition (validation logic)
+    rule_definition: Mapped[dict] = mapped_column(JSON, nullable=False)
+    # Structure: entity, property, operator, value, apply_to, error_code, error_message, skip_if_missing
+    
+    # Execution stage (quote_simulate, quote_checkout, etc.)
+    stage: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    
+    # Whether this rule is active
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    
+    # Optional distributor override (null means applies to all distributors)
+    distributor_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    
+    # Priority/order for execution (lower numbers execute first)
+    priority: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
+    
+    # Audit timestamps
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+    
+    # Relationship
+    product: Mapped["Product"] = relationship("Product")
+    
+    def __repr__(self) -> str:
+        return f"<BusinessRule(id={self.id}, name='{self.name}', product_id={self.product_id}, stage='{self.stage}')>"
+    
+    def to_dict(self) -> dict:
+        """Convert to dictionary for API response."""
+        return {
+            "id": self.id,
+            "product_id": self.product_id,
+            "name": self.name,
+            "description": self.description,
+            "rule_type": self.rule_type,
+            "rule_definition": self.rule_definition,
+            "stage": self.stage,
+            "is_active": self.is_active,
+            "distributor_id": self.distributor_id,
+            "priority": self.priority,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
 # Export all models
 __all__ = [
     "Base",
@@ -610,4 +703,5 @@ __all__ = [
     "SMSTemplate",
     "UserSession",
     "ProductWorkflow",
+    "BusinessRule",
 ]
