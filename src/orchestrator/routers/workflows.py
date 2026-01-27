@@ -4,12 +4,13 @@ import logging
 from datetime import datetime
 from typing import Any, List
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Header, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from orchestrator.database import Product, ProductWorkflow, UserSession, get_db
 from orchestrator.routers.auth import get_current_user
+from orchestrator.routers.instance_api import verify_shared_key
 from orchestrator.utils.logging_helpers import log_activity, log_audit
 
 logger = logging.getLogger(__name__)
@@ -170,6 +171,54 @@ async def list_workflows(
     workflows = query.order_by(ProductWorkflow.endpoint).all()
     
     return workflows
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# PUBLIC ENDPOINTS (for instances using shared key auth)
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@router.get("/public/{product_id}/workflows", response_model=List[WorkflowResponse])
+async def list_workflows_public(
+    product_id: int,
+    endpoint: str | None = None,
+    active_only: bool = True,
+    x_cortex_shared_key: str = Header(None, alias="X-Cortex-Shared-Key"),
+    db: Session = Depends(get_db),
+) -> List[ProductWorkflow]:
+    """
+    Public endpoint for instances to fetch workflows using shared key.
+    
+    Used by instances during startup to load workflow definitions.
+    
+    **Authentication:** X-Cortex-Shared-Key header (not user session)
+    **Scope:** Returns only workflows for the authenticated product
+    
+    Query parameters:
+    - endpoint: Optional filter by specific endpoint (e.g., quote_simulate)
+    - active_only: Only return active workflows (default: true)
+    """
+    # Verify shared key and get product (ensures scoped access)
+    product = verify_shared_key(product_id, x_cortex_shared_key, db)
+    
+    # Build query - scoped to this product only
+    query = db.query(ProductWorkflow).filter(ProductWorkflow.product_id == product_id)
+    
+    if endpoint:
+        query = query.filter(ProductWorkflow.endpoint == endpoint)
+    
+    if active_only:
+        query = query.filter(ProductWorkflow.is_active == True)
+    
+    workflows = query.order_by(ProductWorkflow.endpoint).all()
+    
+    logger.info(f"Instance fetched {len(workflows)} workflows for product {product_id}")
+    
+    return workflows
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# END PUBLIC ENDPOINTS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 
 @router.get("/{product_id}/workflows/available-steps")
