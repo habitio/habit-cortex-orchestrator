@@ -689,6 +689,88 @@ class BusinessRule(Base):
         }
 
 
+class PricingTemplate(Base):
+    """
+    Pricing calculation templates for products.
+    
+    Replaces hardcoded formulas with database-driven, manageable pricing logic.
+    Templates can be visually created, edited, and selected in workflow steps.
+    
+    Example pricing template:
+    {
+        "strategy": "simple_percentage",
+        "strategy_version": "1.0.0",
+        "strategy_config": {
+            "percentage": 0.05,
+            "min_premium": 10.00,
+            "max_premium": 500.00
+        }
+    }
+    """
+    
+    __tablename__ = "pricing_templates"
+    
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    product_id: Mapped[int] = mapped_column(Integer, ForeignKey('products.id'), nullable=False, index=True)
+    
+    # Human-friendly name for UI (e.g., "Standard 5% Coverage Premium")
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    
+    # Optional description
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    
+    # Strategy identifier (maps to registered pricing engine)
+    # Examples: "simple_percentage", "tiered_coverage", "interval_based", "age_risk_matrix"
+    strategy: Mapped[str] = mapped_column(String(100), nullable=False, index=True)
+    
+    # Version of the strategy (for backwards compatibility)
+    strategy_version: Mapped[str] = mapped_column(String(20), default="1.0.0", nullable=False)
+    
+    # Strategy-specific configuration (flexible JSON)
+    strategy_config: Mapped[dict] = mapped_column(JSON, nullable=False)
+    
+    # Whether this template is active
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    
+    # Optional distributor override (null means applies to all distributors)
+    distributor_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    
+    # Audit timestamps
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+    
+    # Relationship
+    product: Mapped["Product"] = relationship("Product")
+    
+    def __repr__(self) -> str:
+        return f"<PricingTemplate(id={self.id}, name='{self.name}', product_id={self.product_id}, strategy='{self.strategy}')>"
+    
+    def to_dict(self) -> dict:
+        """Convert to dictionary for API response."""
+        return {
+            "id": self.id,
+            "product_id": self.product_id,
+            "name": self.name,
+            "description": self.description,
+            "strategy": self.strategy,
+            "strategy_version": self.strategy_version,
+            "strategy_config": self.strategy_config,
+            "is_active": self.is_active,
+            "distributor_id": self.distributor_id,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "updated_at": self.updated_at.isoformat() if self.updated_at else None,
+        }
+
+
 # Export all models
 __all__ = [
     "Base",
@@ -704,4 +786,5 @@ __all__ = [
     "UserSession",
     "ProductWorkflow",
     "BusinessRule",
+    "PricingTemplate",
 ]
