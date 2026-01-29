@@ -127,6 +127,44 @@ STRATEGY_METADATA = {
                                 "minimum": 0,
                                 "ui_widget": "currency_input",
                                 "ui_required": True
+                            },
+                            "frequency_premiums": {
+                                "type": "object",
+                                "title": "Frequency-Specific Prices",
+                                "description": "Override prices for specific payment frequencies in this tier (optional)",
+                                "properties": {
+                                    "monthly": {
+                                        "type": "number",
+                                        "title": "Monthly Price",
+                                        "minimum": 0,
+                                        "ui_widget": "currency_input",
+                                        "ui_help": "Exact price for monthly payments (overrides multiplier)"
+                                    },
+                                    "quarterly": {
+                                        "type": "number",
+                                        "title": "Quarterly Price",
+                                        "minimum": 0,
+                                        "ui_widget": "currency_input",
+                                        "ui_help": "Exact price for quarterly payments"
+                                    },
+                                    "every_six_months": {
+                                        "type": "number",
+                                        "title": "Semi-Annual Price",
+                                        "minimum": 0,
+                                        "ui_widget": "currency_input"
+                                    },
+                                    "annual": {
+                                        "type": "number",
+                                        "title": "Annual Price",
+                                        "minimum": 0,
+                                        "ui_widget": "currency_input",
+                                        "ui_help": "Exact price for annual payments"
+                                    }
+                                },
+                                "ui_widget": "frequency_prices",
+                                "ui_optional": True,
+                                "ui_collapsed": True,
+                                "ui_help": "Set exact prices for specific frequencies. If not set, multiplier is used."
                             }
                         }
                     },
@@ -223,6 +261,41 @@ STRATEGY_METADATA = {
                     "minimum": 0,
                     "ui_widget": "currency_input",
                     "ui_optional": True
+                },
+                "payment_frequency_multipliers": {
+                    "type": "object",
+                    "title": "Payment Frequency Adjustments",
+                    "description": "Optional multipliers for different payment frequencies (e.g., annual discount, monthly admin fee)",
+                    "properties": {
+                        "monthly": {
+                            "type": "number",
+                            "title": "Monthly",
+                            "minimum": 0,
+                            "ui_widget": "decimal_input",
+                            "ui_default": 1.05,
+                            "ui_help": "Multiplier for monthly payments (e.g., 1.05 = 5% fee)"
+                        },
+                        "quarterly": {
+                            "type": "number",
+                            "title": "Quarterly",
+                            "minimum": 0,
+                            "ui_widget": "decimal_input",
+                            "ui_default": 1.0,
+                            "ui_help": "Multiplier for quarterly payments (baseline)"
+                        },
+                        "annual": {
+                            "type": "number",
+                            "title": "Annual",
+                            "minimum": 0,
+                            "ui_widget": "decimal_input",
+                            "ui_default": 0.90,
+                            "ui_help": "Multiplier for annual payments (e.g., 0.90 = 10% discount)"
+                        }
+                    },
+                    "ui_widget": "frequency_multipliers",
+                    "ui_optional": True,
+                    "ui_collapsed": True,
+                    "ui_help": "Adjust pricing based on how often customers pay. Common: annual discount (0.90), monthly fee (1.05)"
                 }
             }
         },
@@ -238,6 +311,25 @@ STRATEGY_METADATA = {
                     ],
                     "min_premium": 15.00,
                     "max_premium": 500.00
+                }
+            },
+            {
+                "name": "Invoice Protection with Payment Terms",
+                "description": "Tiered rates with payment frequency incentives",
+                "config": {
+                    "tiers": [
+                        {"min": 0, "max": 1000, "percentage": 0.08},
+                        {"min": 1000, "max": 5000, "percentage": 0.05},
+                        {"min": 5000, "max": 15000, "percentage": 0.035},
+                        {"min": 15000, "max": None, "percentage": 0.025}
+                    ],
+                    "min_premium": 25.00,
+                    "max_premium": 2500.00,
+                    "payment_frequency_multipliers": {
+                        "monthly": 1.05,
+                        "quarterly": 1.0,
+                        "annual": 0.90
+                    }
                 }
             }
         ]

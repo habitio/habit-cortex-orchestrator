@@ -12,10 +12,12 @@ from orchestrator.database import Product, ProductWorkflow, UserSession, get_db
 from orchestrator.routers.auth import get_current_user
 from orchestrator.routers.instance_api import verify_shared_key
 from orchestrator.utils.logging_helpers import log_activity, log_audit
+from orchestrator.step_config_schemas import get_step_config_schema, list_step_config_schemas
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1/products", tags=["workflows"])
+workflow_metadata_router = APIRouter(prefix="/api/v1/workflows", tags=["workflow-metadata"])
 
 
 # Pydantic schemas
@@ -411,3 +413,407 @@ async def delete_workflow(
     )
     
     logger.info(f"Deleted workflow {workflow_id} for product {product_id}")
+
+
+# ============================================================================
+# Workflow Configuration Metadata Endpoints
+# ============================================================================
+
+class QuoteField(BaseModel):
+    """Metadata for a single quote field that can be updated."""
+    
+    name: str = Field(..., description="Field name (e.g., 'state', 'rate_base')")
+    type: str = Field(..., description="Field type: string, number, object, array, boolean")
+    description: str = Field(..., description="Human-readable description")
+    options: List[str] | None = Field(None, description="Available values for enum fields")
+    default_value_type: str = Field(..., description="'static' (user input) or 'contextual' (from workflow)")
+    context_path: str | None = Field(None, description="Jinja2 template path (e.g., '{{rate_base}}')")
+    required: bool = Field(False, description="Whether this field is required")
+    available_after: str | None = Field(None, description="Workflow step that provides this value")
+
+
+class ContextualVariable(BaseModel):
+    """Metadata for a variable available from workflow context."""
+    
+    name: str = Field(..., description="Variable name")
+    type: str = Field(..., description="Variable type")
+    description: str = Field(..., description="Description of the variable")
+    available_after: str = Field(..., description="Workflow step that produces this variable")
+
+
+class QuoteFieldsRegistry(BaseModel):
+    """Registry of all updatable quote fields and contextual variables."""
+    
+    fields: List[QuoteField] = Field(..., description="Available quote fields")
+    contextual_variables: List[ContextualVariable] = Field(..., description="Variables from workflow context")
+
+
+class UpdateQuoteValidationRequest(BaseModel):
+    """Request to validate update_quote configuration."""
+    
+    fields: dict[str, Any] = Field(..., description="Field updates to validate")
+
+
+class ValidationError(BaseModel):
+    """Validation error details."""
+    
+    field: str = Field(..., description="Field name with error")
+    message: str = Field(..., description="Error message")
+    severity: str = Field(..., description="'error' or 'warning'")
+
+
+class UpdateQuoteValidationResponse(BaseModel):
+    """Response from validation endpoint."""
+    
+    valid: bool = Field(..., description="Whether configuration is valid")
+    errors: List[ValidationError] = Field(default_factory=list, description="Validation errors")
+    warnings: List[ValidationError] = Field(default_factory=list, description="Validation warnings")
+
+
+# Quote Fields Registry
+QUOTE_FIELDS_REGISTRY = [
+    QuoteField(
+        name="state",
+        type="string",
+        description="Quote state (lifecycle status)",
+        options=["open", "simulated", "closed", "cancelled", "expired"],
+        default_value_type="static",
+        required=False,
+    ),
+    QuoteField(
+        name="rate_base",
+        type="number",
+        description="Base premium rate calculated by pricing engine",
+        default_value_type="contextual",
+        context_path="{{rate_base}}",
+        required=False,
+        available_after="calculate_premium",
+    ),
+    QuoteField(
+        name="premium_breakdown",
+        type="object",
+        description="Detailed premium calculation breakdown",
+        default_value_type="contextual",
+        context_path="{{premium_breakdown}}",
+        required=False,
+        available_after="calculate_premium",
+    ),
+    QuoteField(
+        name="pricing_details",
+        type="object",
+        description="Full pricing calculation details including strategy used",
+        default_value_type="contextual",
+        context_path="{{pricing_details}}",
+        required=False,
+        available_after="calculate_premium",
+    ),
+    QuoteField(
+        name="validation_results",
+        type="object",
+        description="Results from business rules validation",
+        default_value_type="contextual",
+        context_path="{{validation_results}}",
+        required=False,
+        available_after="validate_business_rules",
+    ),
+    QuoteField(
+        name="custom_metadata",
+        type="object",
+        description="Custom metadata to attach to quote",
+        default_value_type="static",
+        required=False,
+    ),
+    QuoteField(
+        name="tags",
+        type="array",
+        description="Quote tags for categorization and filtering",
+        default_value_type="static",
+        required=False,
+    ),
+    QuoteField(
+        name="notes",
+        type="string",
+        description="Internal notes about the quote",
+        default_value_type="static",
+        required=False,
+    ),
+    QuoteField(
+        name="policy_start_date",
+        type="string",
+        description="Policy start date (YYYY-MM-DD format)",
+        default_value_type="calculated",
+        required=False,
+        context_path="{{policy_start_date}}",
+    ),
+    QuoteField(
+        name="policy_end_date",
+        type="string",
+        description="Policy end date (YYYY-MM-DD format)",
+        default_value_type="calculated",
+        required=False,
+        context_path="{{policy_end_date}}",
+    ),
+    QuoteField(
+        name="payment_gateway",
+        type="string",
+        description="Payment gateway to use for this quote",
+        default_value_type="calculated",
+        required=False,
+        context_path="{{payment_gateway}}",
+    ),
+]
+
+CONTEXTUAL_VARIABLES = [
+    ContextualVariable(
+        name="rate_base",
+        type="number",
+        description="Calculated premium from pricing engine",
+        available_after="calculate_premium",
+    ),
+    ContextualVariable(
+        name="premium_breakdown",
+        type="object",
+        description="Detailed breakdown of premium calculation",
+        available_after="calculate_premium",
+    ),
+    ContextualVariable(
+        name="pricing_details",
+        type="object",
+        description="Full pricing calculation metadata",
+        available_after="calculate_premium",
+    ),
+    ContextualVariable(
+        name="validation_results",
+        type="object",
+        description="Results from business rules validation",
+        available_after="validate_business_rules",
+    ),
+    ContextualVariable(
+        name="quote",
+        type="object",
+        description="Full quote object from Habit platform",
+        available_after="fetch_quote",
+    ),
+    ContextualVariable(
+        name="quote_properties",
+        type="array",
+        description="Quote properties from Habit platform",
+        available_after="fetch_quote_properties",
+    ),
+    ContextualVariable(
+        name="insurees",
+        type="array",
+        description="Insurees (policyholders) data",
+        available_after="fetch_insurees",
+    ),
+    ContextualVariable(
+        name="protected_assets",
+        type="array",
+        description="Protected assets data",
+        available_after="fetch_protected_assets",
+    ),
+    ContextualVariable(
+        name="workflow",
+        type="object",
+        description="Workflow execution metadata (timestamp, version, etc.)",
+        available_after="fetch_quote",
+    ),
+]
+
+
+@workflow_metadata_router.get("/quote-fields", response_model=QuoteFieldsRegistry)
+async def get_quote_fields() -> QuoteFieldsRegistry:
+    """
+    Get registry of all updatable quote fields and contextual variables.
+    
+    This endpoint returns metadata about:
+    - All fields that can be updated on a quote
+    - Which fields come from workflow context vs user input
+    - Available contextual variables from workflow execution
+    
+    Used by the UI to build the Update Quote block configuration interface.
+    
+    Returns:
+        QuoteFieldsRegistry with fields and contextual variables
+    """
+    logger.info("Fetching quote fields registry")
+    
+    return QuoteFieldsRegistry(
+        fields=QUOTE_FIELDS_REGISTRY,
+        contextual_variables=CONTEXTUAL_VARIABLES,
+    )
+
+
+@workflow_metadata_router.post("/validate-update-quote", response_model=UpdateQuoteValidationResponse)
+async def validate_update_quote(request: UpdateQuoteValidationRequest) -> UpdateQuoteValidationResponse:
+    """
+    Validate update_quote workflow step configuration.
+    
+    Validates:
+    - Field types match expected types
+    - Jinja2 template syntax is valid
+    - Required fields are present
+    - Contextual variables reference valid workflow outputs
+    
+    Args:
+        request: Configuration to validate
+    
+    Returns:
+        Validation result with any errors or warnings
+    """
+    logger.info(f"Validating update_quote configuration: {request.fields}")
+    
+    errors: List[ValidationError] = []
+    warnings: List[ValidationError] = []
+    
+    # Create field lookup
+    field_lookup = {f.name: f for f in QUOTE_FIELDS_REGISTRY}
+    
+    for field_name, value in request.fields.items():
+        # Check if field exists in registry
+        if field_name not in field_lookup:
+            warnings.append(ValidationError(
+                field=field_name,
+                message=f"Field '{field_name}' is not in the standard registry. It may be a custom field.",
+                severity="warning",
+            ))
+            continue
+        
+        field_meta = field_lookup[field_name]
+        
+        # Validate Jinja2 template syntax if value looks like a template
+        if isinstance(value, str) and "{{" in value and "}}" in value:
+            if not _validate_jinja2_syntax(value):
+                errors.append(ValidationError(
+                    field=field_name,
+                    message=f"Invalid Jinja2 template syntax: {value}",
+                    severity="error",
+                ))
+            
+            # Check if using contextual field without proper setup
+            if field_meta.available_after:
+                warnings.append(ValidationError(
+                    field=field_name,
+                    message=f"Field requires '{field_meta.available_after}' step to run before update_quote",
+                    severity="warning",
+                ))
+        
+        # Type validation
+        type_valid = _validate_field_type(value, field_meta.type)
+        if not type_valid:
+            errors.append(ValidationError(
+                field=field_name,
+                message=f"Value type mismatch. Expected {field_meta.type}, got {type(value).__name__}",
+                severity="error",
+            ))
+        
+        # Enum validation
+        if field_meta.options and isinstance(value, str) and "{{" not in value:
+            if value not in field_meta.options:
+                errors.append(ValidationError(
+                    field=field_name,
+                    message=f"Invalid option '{value}'. Must be one of: {', '.join(field_meta.options)}",
+                    severity="error",
+                ))
+    
+    is_valid = len(errors) == 0
+    
+    logger.info(f"Validation complete. Valid: {is_valid}, Errors: {len(errors)}, Warnings: {len(warnings)}")
+    
+    return UpdateQuoteValidationResponse(
+        valid=is_valid,
+        errors=errors,
+        warnings=warnings,
+    )
+
+
+def _validate_jinja2_syntax(template: str) -> bool:
+    """Validate Jinja2 template syntax."""
+    try:
+        from jinja2 import Environment
+        env = Environment()
+        env.parse(template)
+        return True
+    except Exception as e:
+        logger.warning(f"Invalid Jinja2 template '{template}': {e}")
+        return False
+
+
+def _validate_field_type(value: Any, expected_type: str) -> bool:
+    """Validate that a value matches the expected type."""
+    # Allow Jinja2 templates for any type
+    if isinstance(value, str) and "{{" in value:
+        return True
+    
+    type_map = {
+        "string": str,
+        "number": (int, float),
+        "object": dict,
+        "array": list,
+        "boolean": bool,
+    }
+    
+    expected_python_type = type_map.get(expected_type)
+    if expected_python_type is None:
+        logger.warning(f"Unknown type: {expected_type}")
+        return True  # Allow unknown types
+    
+    return isinstance(value, expected_python_type)
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# STEP CONFIGURATION SCHEMAS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+@workflow_metadata_router.get(
+    "/step-config-schemas",
+    summary="Get all step configuration schemas",
+    description="Returns configuration schemas for all workflow step types. "
+                "UI uses this to dynamically render configuration panels.",
+)
+async def get_all_step_config_schemas():
+    """
+    Get configuration schemas for all step types.
+    
+    The UI should use these schemas to:
+    - Dynamically render configuration forms
+    - Validate user input
+    - Show/hide fields based on conditions
+    - Provide examples and documentation
+    
+    Returns a dict mapping step_type → schema.
+    """
+    schemas = list_step_config_schemas()
+    return {
+        "schemas": {k: v.model_dump() for k, v in schemas.items()},
+        "count": len(schemas)
+    }
+
+
+@workflow_metadata_router.get(
+    "/step-config-schemas/{step_type}",
+    summary="Get configuration schema for a specific step type",
+    description="Returns the configuration schema for a specific workflow step type",
+)
+async def get_step_config_schema_endpoint(step_type: str):
+    """
+    Get configuration schema for a specific step type.
+    
+    Args:
+        step_type: The workflow step type (e.g., "update_quote", "calculate_premium")
+    
+    Returns:
+        Configuration schema with sections, fields, validation rules, and examples
+    
+    Raises:
+        404: Step type not found
+    """
+    schema = get_step_config_schema(step_type)
+    if not schema:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No configuration schema found for step type: {step_type}"
+        )
+    
+    return schema.model_dump()

@@ -6,8 +6,9 @@ Provides CRUD endpoints for managing pricing calculation templates.
 
 import logging
 from typing import List, Optional, Any, Dict
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.orm import Session
+from pydantic import BaseModel
 
 from ..database import get_db
 from ..database.models import PricingTemplate, Product
@@ -16,6 +17,22 @@ from ..routers.auth import get_current_user
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/v1", tags=["pricing-templates"])
+
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# REQUEST/RESPONSE MODELS
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+class PricingTemplateUpdate(BaseModel):
+    """Request model for updating pricing templates."""
+    name: Optional[str] = None
+    description: Optional[str] = None
+    strategy: Optional[str] = None
+    strategy_version: Optional[str] = None
+    strategy_config: Optional[dict] = None
+    is_active: Optional[bool] = None
+    distributor_id: Optional[str] = None
 
 
 # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -136,15 +153,9 @@ def create_pricing_template(
 def update_pricing_template(
     product_id: int,
     template_id: int,
+    update_data: PricingTemplateUpdate,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user),
-    name: Optional[str] = None,
-    description: Optional[str] = None,
-    strategy: Optional[str] = None,
-    strategy_version: Optional[str] = None,
-    strategy_config: Optional[dict] = None,
-    is_active: Optional[bool] = None,
-    distributor_id: Optional[str] = None
+    current_user: dict = Depends(get_current_user)
 ):
     """
     Update an existing pricing template.
@@ -160,20 +171,20 @@ def update_pricing_template(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Pricing template not found")
     
     # Update fields
-    if name is not None:
-        template.name = name
-    if description is not None:
-        template.description = description
-    if strategy is not None:
-        template.strategy = strategy
-    if strategy_version is not None:
-        template.strategy_version = strategy_version
-    if strategy_config is not None:
-        template.strategy_config = strategy_config
-    if is_active is not None:
-        template.is_active = is_active
-    if distributor_id is not None:
-        template.distributor_id = distributor_id
+    if update_data.name is not None:
+        template.name = update_data.name
+    if update_data.description is not None:
+        template.description = update_data.description
+    if update_data.strategy is not None:
+        template.strategy = update_data.strategy
+    if update_data.strategy_version is not None:
+        template.strategy_version = update_data.strategy_version
+    if update_data.strategy_config is not None:
+        template.strategy_config = update_data.strategy_config
+    if update_data.is_active is not None:
+        template.is_active = update_data.is_active
+    if update_data.distributor_id is not None:
+        template.distributor_id = update_data.distributor_id
     
     db.commit()
     db.refresh(template)

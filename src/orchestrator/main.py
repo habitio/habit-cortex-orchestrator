@@ -22,6 +22,7 @@ from orchestrator.routers.schema import router as schema_router
 from orchestrator.routers.subscriptions import router as subscriptions_router
 from orchestrator.routers.templates import router as templates_router
 from orchestrator.routers.workflows import router as workflows_router
+from orchestrator.routers.workflows import workflow_metadata_router
 from orchestrator.routers.workflow_step_types import router as workflow_step_types_router
 
 # Configure logging
@@ -59,6 +60,7 @@ app.include_router(products_router)
 app.include_router(product_specs_router)  # Product specs (read-only from Habit Platform)
 app.include_router(subscriptions_router)
 app.include_router(workflows_router)  # Product workflows (visual flow builder)
+app.include_router(workflow_metadata_router)  # Workflow metadata (quote fields, validation)
 app.include_router(workflow_step_types_router)  # Workflow step type metadata for UI
 app.include_router(business_rules_router)  # Business rules management
 app.include_router(pricing_templates_router)  # Pricing templates management
